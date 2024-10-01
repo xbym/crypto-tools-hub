@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, useRef } from 'react'
+import { useState } from 'react'
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -9,7 +9,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { Label } from "@/components/ui/label"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-import { Bitcoin, Wallet, LineChart, Bot, Search, Plus, Edit, Link, Upload, Mail, Phone, MessageCircle, Globe } from 'lucide-react'
+import { Bitcoin, Wallet, LineChart, Bot, Search, Plus, Edit, Link, Mail, Phone, MessageCircle, Globe } from 'lucide-react'
 
 const categories = [
   { name: '全部', icon: <Search className="w-6 h-6" /> },
@@ -24,30 +24,25 @@ interface Tool {
   name: string;
   description: string;
   category: string;
-  imageUrl: string;
   installLink: string;
 }
-
-const CARD_IMAGE_WIDTH = 200;
-const CARD_IMAGE_HEIGHT = 100;
 
 export default function CryptoToolsHub() {
   const [activeCategory, setActiveCategory] = useState('全部')
   const [searchTerm, setSearchTerm] = useState('')
   const [sortBy, setSortBy] = useState<string>('name')
   const [tools, setTools] = useState<Tool[]>([
-    { id: '1', name: '比特币钱包', description: '安全存储比特币', category: '常用钱包', imageUrl: '/placeholder.svg?height=100&width=200&text=比特币钱包', installLink: 'https://bitcoin.org/en/choose-your-wallet' },
-    { id: '2', name: '以太坊钱包', description: '管理以太坊和ERC20代币', category: '常用钱包', imageUrl: '/placeholder.svg?height=100&width=200&text=以太坊钱包', installLink: 'https://ethereum.org/en/wallets/' },
-    { id: '3', name: 'TradingView', description: '专业的图表分析工具', category: '二级看线工具', imageUrl: '/placeholder.svg?height=100&width=200&text=TradingView', installLink: 'https://www.tradingview.com/' },
-    { id: '4', name: '币安自动交易机器人', description: '在币安上自动交易', category: '一级市场机器人', imageUrl: '/placeholder.svg?height=100&width=200&text=币安自动交易机器人', installLink: 'https://www.binance.com/en/support/faq/how-to-use-binance-trading-bots-5bd149a31f0a4e1f9d5ae6b4a4a14c76' },
-    { id: '5', name: '加密货币税务计算器', description: '计算加密货币交易的税务', category: '必备软件', imageUrl: '/placeholder.svg?height=100&width=200&text=加密货币税务计算器', installLink: 'https://koinly.io/' },
-    { id: '6', name: '区块浏览器', description: '查看区块链交易详情', category: '必备软件', imageUrl: '/placeholder.svg?height=100&width=200&text=区块浏览器', installLink: 'https://etherscan.io/' },
-    { id: '7', name: '价格追踪器', description: '实时追踪加密货币价格', category: '二级看线工具', imageUrl: '/placeholder.svg?height=100&width=200&text=价格追踪器', installLink: 'https://coinmarketcap.com/' },
-    { id: '8', name: 'DeFi收益农场机器人', description: '自动化DeFi收益耕作', category: '一级市场机器人', imageUrl: '/placeholder.svg?height=100&width=200&text=DeFi收益农场机器人', installLink: 'https://yearn.finance/' },
+    { id: '1', name: '比特币钱包', description: '安全存储比特币', category: '常用钱包', installLink: 'https://bitcoin.org/en/choose-your-wallet' },
+    { id: '2', name: '以太坊钱包', description: '管理以太坊和ERC20代币', category: '常用钱包', installLink: 'https://ethereum.org/en/wallets/' },
+    { id: '3', name: 'TradingView', description: '专业的图表分析工具', category: '二级看线工具', installLink: 'https://www.tradingview.com/' },
+    { id: '4', name: '币安自动交易机器人', description: '在币安上自动交易', category: '一级市场机器人', installLink: 'https://www.binance.com/en/support/faq/how-to-use-binance-trading-bots-5bd149a31f0a4e1f9d5ae6b4a4a14c76' },
+    { id: '5', name: '加密货币税务计算器', description: '计算加密货币交易的税务', category: '必备软件', installLink: 'https://koinly.io/' },
+    { id: '6', name: '区块浏览器', description: '查看区块链交易详情', category: '必备软件', installLink: 'https://etherscan.io/' },
+    { id: '7', name: '价格追踪器', description: '实时追踪加密货币价格', category: '二级看线工具', installLink: 'https://coinmarketcap.com/' },
+    { id: '8', name: 'DeFi收益农场机器人', description: '自动化DeFi收益耕作', category: '一级市场机器人', installLink: 'https://yearn.finance/' },
   ])
   const [editingTool, setEditingTool] = useState<Tool | null>(null)
   const [isDialogOpen, setIsDialogOpen] = useState(false)
-  const fileInputRef = useRef<HTMLInputElement>(null)
 
   const filteredTools = tools.filter(tool => 
     (activeCategory === '全部' || tool.category === activeCategory) &&
@@ -66,7 +61,6 @@ export default function CryptoToolsHub() {
       name: '',
       description: '',
       category: '必备软件',
-      imageUrl: '/placeholder.svg?height=100&width=200&text=新工具',
       installLink: '',
     })
     setIsDialogOpen(true)
@@ -79,31 +73,6 @@ export default function CryptoToolsHub() {
       setTools([...tools, updatedTool])
     }
     setIsDialogOpen(false)
-  }
-
-  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0]
-    if (file) {
-      const reader = new FileReader()
-      reader.onload = (e) => {
-        const img = new Image()
-        img.onload = () => {
-          const canvas = document.createElement('canvas')
-          canvas.width = CARD_IMAGE_WIDTH
-          canvas.height = CARD_IMAGE_HEIGHT
-          const ctx = canvas.getContext('2d')
-          if (ctx) {
-            ctx.drawImage(img, 0, 0, CARD_IMAGE_WIDTH, CARD_IMAGE_HEIGHT)
-            const resizedImageUrl = canvas.toDataURL('image/jpeg')
-            if (editingTool) {
-              setEditingTool({ ...editingTool, imageUrl: resizedImageUrl })
-            }
-          }
-        }
-        img.src = e.target?.result as string
-      }
-      reader.readAsDataURL(file)
-    }
   }
 
   return (
@@ -195,11 +164,6 @@ export default function CryptoToolsHub() {
               </CardHeader>
               <CardContent>
                 <CardDescription className="text-gray-300">{tool.description}</CardDescription>
-                <img
-                  src={tool.imageUrl}
-                  alt={tool.name}
-                  className="mt-4 rounded-md w-full h-32 object-cover"
-                />
                 <div className="mt-4 flex justify-between">
                   <Button className="bg-green-600 hover:bg-green-700 text-white" asChild>
                     <a href={tool.installLink} target="_blank" rel="noopener noreferrer">
@@ -230,7 +194,6 @@ export default function CryptoToolsHub() {
               name: formData.get('name') as string,
               description: formData.get('description') as string,
               category: formData.get('category') as string,
-              imageUrl: editingTool?.imageUrl || '/placeholder.svg?height=100&width=200&text=新工具',
               installLink: formData.get('installLink') as string,
             }
             handleSaveTool(updatedTool)
@@ -264,35 +227,6 @@ export default function CryptoToolsHub() {
                     ))}
                   </SelectContent>
                 </Select>
-              </div>
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="image" className="text-right">
-                  图片
-                </Label>
-                <div className="col-span-3">
-                  <Input
-                    id="image"
-                    type="file"
-                    accept="image/*"
-                    onChange={handleImageUpload}
-                    className="hidden"
-                    ref={fileInputRef}
-                  />
-                  <Button
-                    type="button"
-                    onClick={() => fileInputRef.current?.click()}
-                    className="bg-blue-600 hover:bg-blue-700"
-                  >
-                    <Upload className="mr-2 h-4 w-4" /> 上传图片
-                  </Button>
-                  {editingTool?.imageUrl && (
-                    <img
-                      src={editingTool.imageUrl}
-                      alt="预览"
-                      className="mt-2 rounded-md w-full h-32 object-cover"
-                    />
-                  )}
-                </div>
               </div>
               <div className="grid grid-cols-4 items-center gap-4">
                 <Label htmlFor="installLink" className="text-right">
