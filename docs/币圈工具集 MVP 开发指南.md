@@ -3,16 +3,16 @@
 
 ## 技术栈
 
-- Next.js 13+ (React 框架)
-- TypeScript (类型安全的 JavaScript)
-- Tailwind CSS (样式框架)
-- shadcn/ui (UI 组件库)
+- [x] Next.js 13+ (React 框架)
+- [x] TypeScript (类型安全的 JavaScript)
+- [x] Tailwind CSS (样式框架)
+- [x] shadcn/ui (UI 组件库)
 
 ## 项目结构
 
-- `/app`: Next.js 13+ 的 App Router 结构
-- `/components`: 可重用的 React 组件
-- `/lib`: 工具函数和共享代码
+- [x] `/app`: Next.js 13+ 的 App Router 结构
+- [x] `/components`: 可重用的 React 组件
+- [x] `/lib`: 工具函数和共享代码
 
 ## 核心功能
 
@@ -32,7 +32,6 @@
 
 - [x] 添加/编辑工具
   - 使用 Dialog 组件创建表单
-  - 实现图片上传和预览功能
 
 - [x] 联系作者
   - 使用 Popover 组件展示联系方式
@@ -56,8 +55,7 @@
 
 ## 性能优化
 
-- [x] 使用 Next.js 的图片组件优化图片加载
-- [x] 实现分页或虚拟滚动（如果工具数量较多）
+- [ ] 实现分页或虚拟滚动（如果工具数量较多）
 
 ## 下一步计划
 
