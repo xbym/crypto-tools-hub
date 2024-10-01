@@ -8,7 +8,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/components/ui/textarea"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { Label } from "@/components/ui/label"
-import { Bitcoin, Wallet, LineChart, Bot, Search, Plus, Edit, Link, Upload } from 'lucide-react'
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+import { Bitcoin, Wallet, LineChart, Bot, Search, Plus, Edit, Link, Upload, Mail, Phone, MessageCircle, Globe } from 'lucide-react'
 
 const categories = [
   { name: '全部', icon: <Search className="w-6 h-6" /> },
@@ -155,6 +156,34 @@ export default function CryptoToolsHub() {
             <Button onClick={handleAddTool} className="bg-green-600 hover:bg-green-700">
               <Plus className="mr-2 h-4 w-4" /> 添加工具
             </Button>
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button className="bg-blue-600 hover:bg-blue-700">
+                  联系作者
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-80 bg-gray-800 border-gray-700 text-gray-100">
+                <div className="grid gap-4">
+                  <h3 className="font-medium text-lg">联系方式</h3>
+                  <div className="grid grid-cols-[25px_1fr] items-center gap-4">
+                    <Mail className="h-5 w-5 text-blue-400" />
+                    <p>example@email.com</p>
+                  </div>
+                  <div className="grid grid-cols-[25px_1fr] items-center gap-4">
+                    <Phone className="h-5 w-5 text-blue-400" />
+                    <p>+86 123 4567 8900</p>
+                  </div>
+                  <div className="grid grid-cols-[25px_1fr] items-center gap-4">
+                    <MessageCircle className="h-5 w-5 text-blue-400" />
+                    <p>WeChat: author_wechat</p>
+                  </div>
+                  <div className="grid grid-cols-[25px_1fr] items-center gap-4">
+                    <Globe className="h-5 w-5 text-blue-400" />
+                    <p>https://author-website.com</p>
+                  </div>
+                </div>
+              </PopoverContent>
+            </Popover>
           </div>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
