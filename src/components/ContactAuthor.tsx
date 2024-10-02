@@ -4,7 +4,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 export default function ContactAuthor() {
   return (
     <div className="space-y-6">
-      <h2 className="text-3xl font-bold text-blue-400">联系作者</h2>
       <p className="text-gray-300">如果您有任何问题或建议，请随时与我联系。</p>
       <Card className="bg-gray-800 border-gray-700">
         <CardHeader>
