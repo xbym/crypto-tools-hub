@@ -5,8 +5,9 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Bitcoin, Wallet, LineChart, Bot, Search, Link, Mail, BookOpen, Coins, Zap } from 'lucide-react'
+import { Bitcoin, Wallet, LineChart, Bot, Search, Link, Mail, BookOpen, Coins, Zap, Bell } from 'lucide-react'
 import ContactAuthor from '@/components/ContactAuthor'
+import ImportantAnnouncements from '@/components/ImportantAnnouncements'
 
 const categories = [
   { name: '全部', icon: <Search className="w-6 h-6" /> },
@@ -17,11 +18,12 @@ const categories = [
   { name: '科学家学习', icon: <BookOpen className="w-6 h-6" /> },
   { name: '币圈基础知识', icon: <Coins className="w-6 h-6" /> },
   { name: '空投学习', icon: <Zap className="w-6 h-6" /> },
+  { name: '重要提醒', icon: <Bell className="w-6 h-6" /> },
   { name: '联系作者', icon: <Mail className="w-6 h-6" /> },
 ]
 
 const initialTools = [
-  { id: '1', name: '比特币', description: '安全存储比特币', category: '常用钱包', installLink: 'https://bitcoin.org/en/choose-your-wallet' },
+  { id: '1', name: '比特币钱包', description: '安全存储比特币', category: '常用钱包', installLink: 'https://bitcoin.org/en/choose-your-wallet' },
   { id: '2', name: '以太坊钱包', description: '管理以太坊和ERC20代币', category: '常用钱包', installLink: 'https://ethereum.org/en/wallets/' },
   { id: '3', name: 'TradingView', description: '专业的图表分析工具', category: '二级看线工具', installLink: 'https://www.tradingview.com/' },
   { id: '4', name: '币安自动交易机器人', description: '在币安上自动交易', category: '一级市场机器人', installLink: 'https://www.binance.com/en/support/faq/how-to-use-binance-trading-bots-5bd149a31f0a4e1f9d5ae6b4a4a14c76' },
@@ -83,7 +85,7 @@ export default function CryptoToolsHub() {
         <div className="mb-6 flex justify-between items-center">
           <h2 className="text-3xl font-bold text-blue-400">{activeCategory}</h2>
           <div className="flex gap-4">
-            {activeCategory !== '联系作者' && (
+            {activeCategory !== '联系作者' && activeCategory !== '重要提醒' && (
               <>
                 <Input
                   placeholder="搜索工具..."
@@ -109,6 +111,8 @@ export default function CryptoToolsHub() {
         </div>
         {activeCategory === '联系作者' ? (
           <ContactAuthor />
+        ) : activeCategory === '重要提醒' ? (
+          <ImportantAnnouncements />
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredTools.map((tool) => (
