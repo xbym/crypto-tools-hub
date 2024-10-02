@@ -17,6 +17,9 @@ const categories = [
   { name: '常用钱包', icon: <Wallet className="w-6 h-6" /> },
   { name: '二级看线工具', icon: <LineChart className="w-6 h-6" /> },
   { name: '一级市场机器人', icon: <Bot className="w-6 h-6" /> },
+  { name: '币圈基础知识学习', icon: <Bot className="w-6 h-6" /> },
+  { name: '空投学习', icon: <Bot className="w-6 h-6" /> },
+  { name: '科学家学习', icon: <Bot className="w-6 h-6" /> },
 ]
 
 interface Tool {
