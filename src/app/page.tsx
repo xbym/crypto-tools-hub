@@ -27,26 +27,67 @@ interface Tool {
   installLink: string;
 }
 
+const initialTools: Tool[] = [
+  { id: '1', name: '比特币钱包', description: '安全存储比特币', category: '常用钱包', installLink: 'https://bitcoin.org/en/choose-your-wallet' },
+  { id: '2', name: '以太坊钱包', description: '管理以太坊和ERC20代币', category: '常用钱包', installLink: 'https://ethereum.org/en/wallets/' },
+  { id: '3', name: 'TradingView', description: '专业的图表分析工具', category: '二级看线工具', installLink: 'https://www.tradingview.com/' },
+  { id: '4', name: '币安自动交易机器人', description: '在币安上自动交易', category: '一级市场机器人', installLink: 'https://www.binance.com/en/support/faq/how-to-use-binance-trading-bots-5bd149a31f0a4e1f9d5ae6b4a4a14c76' },
+  { id: '5', name: '加密货币税务计算器', description: '计算加密货币交易的税务', category: '必备软件', installLink: 'https://koinly.io/' },
+  { id: '6', name: '区块浏览器', description: '查看区块链交易详情', category: '必备软件', installLink: 'https://etherscan.io/' },
+  { id: '7', name: '价格追踪器', description: '实时追踪加密货币价格', category: '二级看线工具', installLink: 'https://coinmarketcap.com/' },
+  { id: '8', name: 'DeFi收益农场机器人', description: '自动化DeFi收益耕作', category: '一级市场机器人', installLink: 'https://yearn.finance/' },
+]
+
 export default function CryptoToolsHub() {
   const [activeCategory, setActiveCategory] = useState('全部')
   const [searchTerm, setSearchTerm] = useState('')
   const [sortBy, setSortBy] = useState<string>('name')
-  const [tools, setTools] = useState<Tool[]>([
-    { id: '1', name: '比特币钱包', description: '安全存储比特币', category: '常用钱包', installLink: 'https://bitcoin.org/en/choose-your-wallet' },
-    { id: '2', name: '以太坊钱包', description: '管理以太坊和ERC20代币', category: '常用钱包', installLink: 'https://ethereum.org/en/wallets/' },
-    { id: '3', name: 'TradingView', description: '专业的图表分析工具', category: '二级看线工具', installLink: 'https://www.tradingview.com/' },
-    { id: '4', name: '币安自动交易机器人', description: '在币安上自动交易', category: '一级市场机器人', installLink: 'https://www.binance.com/en/support/faq/how-to-use-binance-trading-bots-5bd149a31f0a4e1f9d5ae6b4a4a14c76' },
-    { id: '5', name: '加密货币税务计算器', description: '计算加密货币交易的税务', category: '必备软件', installLink: 'https://koinly.io/' },
-    { id: '6', name: '区块浏览器', description: '查看区块链交易详情', category: '必备软件', installLink: 'https://etherscan.io/' },
-    { id: '7', name: '价格追踪器', description: '实时追踪加密货币价格', category: '二级看线工具', installLink: 'https://coinmarketcap.com/' },
-    { id: '8', name: 'DeFi收益农场机器人', description: '自动化DeFi收益耕作', category: '一级市场机器人', installLink: 'https://yearn.finance/' },
-  ])
+  const [tools, setTools] = useState<Tool[]>([])
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [editingTool, setEditingTool] = useState<Tool | null>(null)
+  const [debugInfo, setDebugInfo] = useState<string>('')
 
   useEffect(() => {
-    console.log('Component mounted')
+    const loadTools = () => {
+      try {
+        const savedTools = localStorage.getItem('cryptoTools')
+        if (savedTools) {
+          const parsedTools = JSON.parse(savedTools)
+          setTools(parsedTools)
+          setDebugInfo(`已从 localStorage 加载 ${parsedTools.length} 个工具`)
+        } else {
+          setTools(initialTools)
+          localStorage.setItem('cryptoTools', JSON.stringify(initialTools))
+          setDebugInfo(`已初始化并保存 ${initialTools.length} 个默认工具`)
+        }
+      } catch (error: unknown) {
+        console.error('加载工具时出错:', error)
+        if (error instanceof Error) {
+          setDebugInfo(`加载工具时出错: ${error.message}`)
+        } else {
+          setDebugInfo('加载工具时出现未知错误')
+        }
+        // 如果出错，使用初始工具数据
+        setTools(initialTools)
+      }
+    }
+
+    loadTools()
   }, [])
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('cryptoTools', JSON.stringify(tools))
+      setDebugInfo(`已将 ${tools.length} 个工具保存到 localStorage`)
+    } catch (error: unknown) {
+      console.error('保存到 localStorage 时出错:', error)
+      if (error instanceof Error) {
+        setDebugInfo(`保存到 localStorage 时出错: ${error.message}`)
+      } else {
+        setDebugInfo('保存到 localStorage 时出现未知错误')
+      }
+    }
+  }, [tools])
 
   const filteredTools = tools.filter(tool => 
     (activeCategory === '全部' || tool.category === activeCategory) &&
@@ -159,6 +200,11 @@ export default function CryptoToolsHub() {
             </Popover>
           </div>
         </div>
+        {debugInfo && (
+          <div className="mb-4 p-4 bg-yellow-200 text-yellow-800 rounded">
+            调试信息: {debugInfo}
+          </div>
+        )}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredTools.map((tool) => (
             <Card key={tool.id} className="bg-gray-800 border-gray-700">
@@ -205,19 +251,19 @@ export default function CryptoToolsHub() {
             <div className="grid gap-4 py-4">
               <div className="grid grid-cols-4 items-center gap-4">
                 <Label htmlFor="name" className="text-right">名称</Label>
-                <Input id="name" name="name" defaultValue={editingTool?.name} className="col-span-3" />
+                <Input id="name" name="name" defaultValue={editingTool?.name} className="col-span-3 bg-gray-700 text-gray-100" />
               </div>
               <div className="grid grid-cols-4 items-center gap-4">
                 <Label htmlFor="description" className="text-right">描述</Label>
-                <Textarea id="description" name="description" defaultValue={editingTool?.description} className="col-span-3" />
+                <Textarea id="description" name="description" defaultValue={editingTool?.description} className="col-span-3 bg-gray-700 text-gray-100" />
               </div>
               <div className="grid grid-cols-4 items-center gap-4">
                 <Label htmlFor="category" className="text-right">分类</Label>
                 <Select name="category" defaultValue={editingTool?.category}>
-                  <SelectTrigger className="col-span-3">
+                  <SelectTrigger className="col-span-3 bg-gray-700 text-gray-100">
                     <SelectValue placeholder="选择分类" />
                   </SelectTrigger>
-                  <SelectContent>
+                  <SelectContent className="bg-gray-700 text-gray-100">
                     {categories.slice(1).map((category) => (
                       <SelectItem key={category.name} value={category.name}>{category.name}</SelectItem>
                     ))}
@@ -226,11 +272,11 @@ export default function CryptoToolsHub() {
               </div>
               <div className="grid grid-cols-4 items-center gap-4">
                 <Label htmlFor="installLink" className="text-right">安装链接</Label>
-                <Input id="installLink" name="installLink" defaultValue={editingTool?.installLink} className="col-span-3" />
+                <Input id="installLink" name="installLink" defaultValue={editingTool?.installLink} className="col-span-3 bg-gray-700 text-gray-100" />
               </div>
             </div>
             <DialogTrigger asChild>
-              <Button type="submit">保存</Button>
+              <Button type="submit" className="bg-blue-600 hover:bg-blue-700">保存</Button>
             </DialogTrigger>
           </form>
         </DialogContent>
