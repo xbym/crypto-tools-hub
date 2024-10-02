@@ -9,7 +9,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
 import { Label } from "@/components/ui/label"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-import { Bitcoin, Wallet, LineChart, Bot, Search, Plus, Edit, Link, Mail, Phone, MessageCircle, Globe, Lock, Unlock } from 'lucide-react'
+import { Bitcoin, Wallet, LineChart, Bot, Search, Plus, Edit, Link, Mail, Phone, MessageCircle, Globe, Lock, Unlock, BookOpen, Coins, Zap } from 'lucide-react'
 
 const categories = [
   { name: '全部', icon: <Search className="w-6 h-6" /> },
@@ -17,9 +17,9 @@ const categories = [
   { name: '常用钱包', icon: <Wallet className="w-6 h-6" /> },
   { name: '二级看线工具', icon: <LineChart className="w-6 h-6" /> },
   { name: '一级市场机器人', icon: <Bot className="w-6 h-6" /> },
-  { name: '币圈基础知识学习', icon: <Bot className="w-6 h-6" /> },
-  { name: '空投学习', icon: <Bot className="w-6 h-6" /> },
-  { name: '科学家学习', icon: <Bot className="w-6 h-6" /> },
+  { name: '科学家学习', icon: <BookOpen className="w-6 h-6" /> },
+  { name: '币圈基础知识', icon: <Coins className="w-6 h-6" /> },
+  { name: '空投学习', icon: <Zap className="w-6 h-6" /> },
 ]
 
 interface Tool {
@@ -62,6 +62,9 @@ export default function CryptoToolsHub() {
             { id: '6', name: '区块浏览器', description: '查看区块链交易详情', category: '必备软件', installLink: 'https://etherscan.io/' },
             { id: '7', name: '价格追踪器', description: '实时追踪加密货币价格', category: '二级看线工具', installLink: 'https://coinmarketcap.com/' },
             { id: '8', name: 'DeFi收益农场机器人', description: '自动化DeFi收益耕作', category: '一级市场机器人', installLink: 'https://yearn.finance/' },
+            { id: '9', name: '区块链技术课程', description: '深入学习区块链技术原理', category: '科学家学习', installLink: 'https://www.coursera.org/specializations/blockchain' },
+            { id: '10', name: '加密货币入门指南', description: '了解加密货币的基本概念', category: '币圈基础知识', installLink: 'https://www.investopedia.com/terms/c/cryptocurrency.asp' },
+            { id: '11', name: '空投跟踪器', description: '获取最新的空投信息', category: '空投学习', installLink: 'https://airdrops.io/' },
           ]
           setTools(initialTools)
           localStorage.setItem('cryptoTools', JSON.stringify(initialTools))
