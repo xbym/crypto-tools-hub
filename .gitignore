@@ -37,3 +37,6 @@ next-env.d.ts
 
 # 忽略 Crypto Tools Hub-win32-x64 文件夹
 /Crypto Tools Hub-win32-x64/
+
+# 忽略所有 .exe 文件
+*.exe
