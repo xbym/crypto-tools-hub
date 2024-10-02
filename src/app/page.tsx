@@ -1,12 +1,12 @@
 "use client"
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { Label } from "@/components/ui/label"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { Bitcoin, Wallet, LineChart, Bot, Search, Plus, Edit, Link, Mail, Phone, MessageCircle, Globe } from 'lucide-react'
@@ -31,18 +31,33 @@ export default function CryptoToolsHub() {
   const [activeCategory, setActiveCategory] = useState('全部')
   const [searchTerm, setSearchTerm] = useState('')
   const [sortBy, setSortBy] = useState<string>('name')
-  const [tools, setTools] = useState<Tool[]>([
-    { id: '1', name: '比特币钱包', description: '安全存储比特币', category: '常用钱包', installLink: 'https://bitcoin.org/en/choose-your-wallet' },
-    { id: '2', name: '以太坊钱包', description: '管理以太坊和ERC20代币', category: '常用钱包', installLink: 'https://ethereum.org/en/wallets/' },
-    { id: '3', name: 'TradingView', description: '专业的图表分析工具', category: '二级看线工具', installLink: 'https://www.tradingview.com/' },
-    { id: '4', name: '币安自动交易机器人', description: '在币安上自动交易', category: '一级市场机器人', installLink: 'https://www.binance.com/en/support/faq/how-to-use-binance-trading-bots-5bd149a31f0a4e1f9d5ae6b4a4a14c76' },
-    { id: '5', name: '加密货币税务计算器', description: '计算加密货币交易的税务', category: '必备软件', installLink: 'https://koinly.io/' },
-    { id: '6', name: '区块浏览器', description: '查看区块链交易详情', category: '必备软件', installLink: 'https://etherscan.io/' },
-    { id: '7', name: '价格追踪器', description: '实时追踪加密货币价格', category: '二级看线工具', installLink: 'https://coinmarketcap.com/' },
-    { id: '8', name: 'DeFi收益农场机器人', description: '自动化DeFi收益耕作', category: '一级市场机器人', installLink: 'https://yearn.finance/' },
-  ])
-  const [editingTool, setEditingTool] = useState<Tool | null>(null)
+  const [tools, setTools] = useState<Tool[]>([])
   const [isDialogOpen, setIsDialogOpen] = useState(false)
+  const [editingTool, setEditingTool] = useState<Tool | null>(null)
+
+  useEffect(() => {
+    const savedTools = localStorage.getItem('cryptoTools')
+    if (savedTools) {
+      setTools(JSON.parse(savedTools))
+    } else {
+      const initialTools: Tool[] = [
+        { id: '1', name: '比特币钱包', description: '安全存储比特币', category: '常用钱包', installLink: 'https://bitcoin.org/en/choose-your-wallet' },
+        { id: '2', name: '以太坊钱包', description: '管理以太坊和ERC20代币', category: '常用钱包', installLink: 'https://ethereum.org/en/wallets/' },
+        { id: '3', name: 'TradingView', description: '专业的图表分析工具', category: '二级看线工具', installLink: 'https://www.tradingview.com/' },
+        { id: '4', name: '币安自动交易机器人', description: '在币安上自动交易', category: '一级市场机器人', installLink: 'https://www.binance.com/en/support/faq/how-to-use-binance-trading-bots-5bd149a31f0a4e1f9d5ae6b4a4a14c76' },
+        { id: '5', name: '加密货币税务计算器', description: '计算加密货币交易的税务', category: '必备软件', installLink: 'https://koinly.io/' },
+        { id: '6', name: '区块浏览器', description: '查看区块链交易详情', category: '必备软件', installLink: 'https://etherscan.io/' },
+        { id: '7', name: '价格追踪器', description: '实时追踪加密货币价格', category: '二级看线工具', installLink: 'https://coinmarketcap.com/' },
+        { id: '8', name: 'DeFi收益农场机器人', description: '自动化DeFi收益耕作', category: '一级市场机器人', installLink: 'https://yearn.finance/' },
+      ]
+      setTools(initialTools)
+      localStorage.setItem('cryptoTools', JSON.stringify(initialTools))
+    }
+  }, [])
+
+  useEffect(() => {
+    localStorage.setItem('cryptoTools', JSON.stringify(tools))
+  }, [tools])
 
   const filteredTools = tools.filter(tool => 
     (activeCategory === '全部' || tool.category === activeCategory) &&
@@ -107,7 +122,7 @@ export default function CryptoToolsHub() {
             <Input
               placeholder="搜索工具..."
               value={searchTerm}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchTerm(e.target.value)}
+              onChange={(e) => setSearchTerm(e.target.value)}
               className="w-64 bg-gray-800 text-gray-100 border-gray-700 focus:border-blue-500"
             />
             <Select 
@@ -200,46 +215,34 @@ export default function CryptoToolsHub() {
           }}>
             <div className="grid gap-4 py-4">
               <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="name" className="text-right">
-                  名称
-                </Label>
-                <Input id="name" name="name" defaultValue={editingTool?.name} className="col-span-3 bg-gray-700 text-gray-100" />
+                <Label htmlFor="name" className="text-right">名称</Label>
+                <Input id="name" name="name" defaultValue={editingTool?.name} className="col-span-3" />
               </div>
               <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="description" className="text-right">
-                  描述
-                </Label>
-                <Textarea id="description" name="description" defaultValue={editingTool?.description} className="col-span-3 bg-gray-700 text-gray-100" />
+                <Label htmlFor="description" className="text-right">描述</Label>
+                <Textarea id="description" name="description" defaultValue={editingTool?.description} className="col-span-3" />
               </div>
               <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="category" className="text-right">
-                  分类
-                </Label>
+                <Label htmlFor="category" className="text-right">分类</Label>
                 <Select name="category" defaultValue={editingTool?.category}>
-                  <SelectTrigger className="col-span-3 bg-gray-700 text-gray-100">
+                  <SelectTrigger className="col-span-3">
                     <SelectValue placeholder="选择分类" />
                   </SelectTrigger>
-                  <SelectContent className="bg-gray-700 text-gray-100">
+                  <SelectContent>
                     {categories.slice(1).map((category) => (
-                      <SelectItem key={category.name} value={category.name}>
-                        {category.name}
-                      </SelectItem>
+                      <SelectItem key={category.name} value={category.name}>{category.name}</SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
               </div>
               <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="installLink" className="text-right">
-                  安装链接
-                </Label>
-                <Input id="installLink" name="installLink" defaultValue={editingTool?.installLink} className="col-span-3 bg-gray-700 text-gray-100" />
+                <Label htmlFor="installLink" className="text-right">安装链接</Label>
+                <Input id="installLink" name="installLink" defaultValue={editingTool?.installLink} className="col-span-3" />
               </div>
             </div>
-            <div className="flex justify-end mt-4">
-              <Button type="submit" className="bg-blue-600 hover:bg-blue-700">
-                保存
-              </Button>
-            </div>
+            <DialogTrigger asChild>
+              <Button type="submit">保存</Button>
+            </DialogTrigger>
           </form>
         </DialogContent>
       </Dialog>
