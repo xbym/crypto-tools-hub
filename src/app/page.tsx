@@ -8,8 +8,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/components/ui/textarea"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
 import { Label } from "@/components/ui/label"
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { Bitcoin, Wallet, LineChart, Bot, Search, Plus, Edit, Link, Mail, Phone, MessageCircle, Globe, Lock, Unlock, BookOpen, Coins, Zap } from 'lucide-react'
+import ContactAuthor from '@/components/ContactAuthor'
 
 const categories = [
   { name: '全部', icon: <Search className="w-6 h-6" /> },
@@ -20,6 +20,7 @@ const categories = [
   { name: '科学家学习', icon: <BookOpen className="w-6 h-6" /> },
   { name: '币圈基础知识', icon: <Coins className="w-6 h-6" /> },
   { name: '空投学习', icon: <Zap className="w-6 h-6" /> },
+  { name: '联系作者', icon: <Mail className="w-6 h-6" /> },
 ]
 
 interface Tool {
@@ -182,25 +183,29 @@ export default function CryptoToolsHub() {
         <div className="mb-6 flex justify-between items-center">
           <h2 className="text-3xl font-bold text-blue-400">{activeCategory}</h2>
           <div className="flex gap-4">
-            <Input
-              placeholder="搜索工具..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-64 bg-gray-800 text-gray-100 border-gray-700 focus:border-blue-500"
-            />
-            <Select 
-              value={sortBy} 
-              onValueChange={(value: string) => setSortBy(value)}
-            >
-              <SelectTrigger className="w-[180px] bg-gray-800 text-gray-100 border-gray-700">
-                <SelectValue placeholder="排序方式" />
-              </SelectTrigger>
-              <SelectContent className="bg-gray-800 text-gray-100 border-gray-700">
-                <SelectItem value="name">按名称</SelectItem>
-                <SelectItem value="category">按类别</SelectItem>
-              </SelectContent>
-            </Select>
-            {isAdminMode && (
+            {activeCategory !== '联系作者' && (
+              <>
+                <Input
+                  placeholder="搜索工具..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="w-64 bg-gray-800 text-gray-100 border-gray-700 focus:border-blue-500"
+                />
+                <Select 
+                  value={sortBy} 
+                  onValueChange={(value: string) => setSortBy(value)}
+                >
+                  <SelectTrigger className="w-[180px] bg-gray-800 text-gray-100 border-gray-700">
+                    <SelectValue placeholder="排序方式" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-gray-800 text-gray-100 border-gray-700">
+                    <SelectItem value="name">按名称</SelectItem>
+                    <SelectItem value="category">按类别</SelectItem>
+                  </SelectContent>
+                </Select>
+              </>
+            )}
+            {isAdminMode && activeCategory !== '联系作者' && (
               <Button onClick={handleAddTool} className="bg-green-600 hover:bg-green-700">
                 <Plus className="mr-2 h-4 w-4" /> 添加工具
               </Button>
@@ -212,34 +217,6 @@ export default function CryptoToolsHub() {
               {isAdminMode ? <Unlock className="mr-2 h-4 w-4" /> : <Lock className="mr-2 h-4 w-4" />}
               {isAdminMode ? '退出管理员模式' : '管理员模式'}
             </Button>
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button className="bg-blue-600 hover:bg-blue-700">
-                  联系作者
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-80 bg-gray-800 border-gray-700 text-gray-100">
-                <div className="grid gap-4">
-                  <h3 className="font-medium text-lg">联系方式</h3>
-                  <div className="grid grid-cols-[25px_1fr] items-center gap-4">
-                    <Mail className="h-5 w-5 text-blue-400" />
-                    <p>example@email.com</p>
-                  </div>
-                  <div className="grid grid-cols-[25px_1fr] items-center gap-4">
-                    <Phone className="h-5 w-5 text-blue-400" />
-                    <p>+86 123 4567 8900</p>
-                  </div>
-                  <div className="grid grid-cols-[25px_1fr] items-center gap-4">
-                    <MessageCircle className="h-5 w-5 text-blue-400" />
-                    <p>WeChat: author_wechat</p>
-                  </div>
-                  <div className="grid grid-cols-[25px_1fr] items-center gap-4">
-                    <Globe className="h-5 w-5 text-blue-400" />
-                    <p>https://author-website.com</p>
-                  </div>
-                </div>
-              </PopoverContent>
-            </Popover>
           </div>
         </div>
         {debugInfo && (
@@ -247,31 +224,35 @@ export default function CryptoToolsHub() {
             调试信息: {debugInfo}
           </div>
         )}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredTools.map((tool) => (
-            <Card key={tool.id} className="bg-gray-800 border-gray-700">
-              <CardHeader>
-                <CardTitle className="text-blue-400">{tool.name}</CardTitle>
-                <CardDescription className="text-gray-400">{tool.category}</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <CardDescription className="text-gray-300">{tool.description}</CardDescription>
-                <div className="mt-4 flex justify-between">
-                  <Button className="bg-green-600 hover:bg-green-700 text-white" asChild>
-                    <a href={tool.installLink} target="_blank" rel="noopener noreferrer">
-                      <Link className="mr-2 h-4 w-4" /> 安装
-                    </a>
-                  </Button>
-                  {isAdminMode && (
-                    <Button onClick={() => handleEditTool(tool)} variant="outline" className="text-blue-400 border-blue-400 hover:bg-blue-400 hover:text-white">
-                      <Edit className="mr-2 h-4 w-4" /> 编辑
+        {activeCategory === '联系作者' ? (
+          <ContactAuthor />
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {filteredTools.map((tool) => (
+              <Card key={tool.id} className="bg-gray-800 border-gray-700">
+                <CardHeader>
+                  <CardTitle className="text-blue-400">{tool.name}</CardTitle>
+                  <CardDescription className="text-gray-400">{tool.category}</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <CardDescription className="text-gray-300">{tool.description}</CardDescription>
+                  <div className="mt-4 flex justify-between">
+                    <Button className="bg-green-600 hover:bg-green-700 text-white" asChild>
+                      <a href={tool.installLink} target="_blank" rel="noopener noreferrer">
+                        <Link className="mr-2 h-4 w-4" /> 安装
+                      </a>
                     </Button>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+                    {isAdminMode && (
+                      <Button onClick={() => handleEditTool(tool)} variant="outline" className="text-blue-400 border-blue-400 hover:bg-blue-400 hover:text-white">
+                        <Edit className="mr-2 h-4 w-4" /> 编辑
+                      </Button>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* Edit/Add Tool Dialog */}
@@ -311,7 +292,7 @@ export default function CryptoToolsHub() {
                     <SelectValue placeholder="选择分类" />
                   </SelectTrigger>
                   <SelectContent className="bg-gray-700 text-gray-100">
-                    {categories.slice(1).map((category) => (
+                    {categories.slice(1, -1).map((category) => (
                       <SelectItem key={category.name} value={category.name}>{category.name}</SelectItem>
                     ))}
                   </SelectContent>
