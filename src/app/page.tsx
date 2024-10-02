@@ -67,7 +67,6 @@ export default function CryptoToolsHub() {
         } else {
           setDebugInfo('加载工具时出现未知错误')
         }
-        // 如果出错，使用初始工具数据
         setTools(initialTools)
       }
     }
@@ -112,12 +111,19 @@ export default function CryptoToolsHub() {
   }
 
   const handleSaveTool = (updatedTool: Tool) => {
-    if (editingTool?.id) {
-      setTools(tools.map(tool => tool.id === updatedTool.id ? updatedTool : tool))
-    } else {
-      setTools([...tools, updatedTool])
-    }
-    setIsDialogOpen(false)
+    setTools(prevTools => {
+      let newTools: Tool[];
+      if (editingTool?.id) {
+        newTools = prevTools.map(tool => tool.id === updatedTool.id ? updatedTool : tool);
+        setDebugInfo(`已更新工具: ${updatedTool.name}`);
+      } else {
+        newTools = [...prevTools, updatedTool];
+        setDebugInfo(`已添加新工具: ${updatedTool.name}`);
+      }
+      return newTools;
+    });
+    setIsDialogOpen(false);
+    setEditingTool(null);
   }
 
   return (
