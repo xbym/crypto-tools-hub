@@ -9,7 +9,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
 import { Label } from "@/components/ui/label"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-import { Bitcoin, Wallet, LineChart, Bot, Search, Plus, Edit, Link, Mail, Phone, MessageCircle, Globe } from 'lucide-react'
+import { Bitcoin, Wallet, LineChart, Bot, Search, Plus, Edit, Link, Mail, Phone, MessageCircle, Globe, Lock, Unlock } from 'lucide-react'
 
 const categories = [
   { name: '全部', icon: <Search className="w-6 h-6" /> },
@@ -27,6 +27,8 @@ interface Tool {
   installLink: string;
 }
 
+const ADMIN_PASSWORD = "admin123" // 在实际应用中，请使用更安全的方式存储密码
+
 export default function CryptoToolsHub() {
   const [activeCategory, setActiveCategory] = useState('全部')
   const [searchTerm, setSearchTerm] = useState('')
@@ -35,6 +37,9 @@ export default function CryptoToolsHub() {
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [editingTool, setEditingTool] = useState<Tool | null>(null)
   const [debugInfo, setDebugInfo] = useState<string>('')
+  const [isAdminMode, setIsAdminMode] = useState(false)
+  const [adminPassword, setAdminPassword] = useState('')
+  const [showAdminDialog, setShowAdminDialog] = useState(false)
 
   useEffect(() => {
     const loadTools = () => {
@@ -126,6 +131,22 @@ export default function CryptoToolsHub() {
     setEditingTool(null)
   }
 
+  const handleAdminLogin = () => {
+    if (adminPassword === ADMIN_PASSWORD) {
+      setIsAdminMode(true)
+      setShowAdminDialog(false)
+      setAdminPassword('')
+      setDebugInfo('管理员模式已启用')
+    } else {
+      setDebugInfo('密码错误，请重试')
+    }
+  }
+
+  const handleAdminLogout = () => {
+    setIsAdminMode(false)
+    setDebugInfo('管理员模式已禁用')
+  }
+
   return (
     <div className="flex h-screen bg-gray-900 text-gray-100">
       {/* Sidebar */}
@@ -173,8 +194,17 @@ export default function CryptoToolsHub() {
                 <SelectItem value="category">按类别</SelectItem>
               </SelectContent>
             </Select>
-            <Button onClick={handleAddTool} className="bg-green-600 hover:bg-green-700">
-              <Plus className="mr-2 h-4 w-4" /> 添加工具
+            {isAdminMode && (
+              <Button onClick={handleAddTool} className="bg-green-600 hover:bg-green-700">
+                <Plus className="mr-2 h-4 w-4" /> 添加工具
+              </Button>
+            )}
+            <Button
+              onClick={isAdminMode ? handleAdminLogout : () => setShowAdminDialog(true)}
+              className={isAdminMode ? "bg-red-600 hover:bg-red-700" : "bg-blue-600 hover:bg-blue-700"}
+            >
+              {isAdminMode ? <Unlock className="mr-2 h-4 w-4" /> : <Lock className="mr-2 h-4 w-4" />}
+              {isAdminMode ? '退出管理员模式' : '管理员模式'}
             </Button>
             <Popover>
               <PopoverTrigger asChild>
@@ -226,9 +256,11 @@ export default function CryptoToolsHub() {
                       <Link className="mr-2 h-4 w-4" /> 安装
                     </a>
                   </Button>
-                  <Button onClick={() => handleEditTool(tool)} variant="outline" className="text-blue-400 border-blue-400 hover:bg-blue-400 hover:text-white">
-                    <Edit className="mr-2 h-4 w-4" /> 编辑
-                  </Button>
+                  {isAdminMode && (
+                    <Button onClick={() => handleEditTool(tool)} variant="outline" className="text-blue-400 border-blue-400 hover:bg-blue-400 hover:text-white">
+                      <Edit className="mr-2 h-4 w-4" /> 编辑
+                    </Button>
+                  )}
                 </div>
               </CardContent>
             </Card>
@@ -266,7 +298,7 @@ export default function CryptoToolsHub() {
                 <Label htmlFor="description" className="text-right">描述</Label>
                 <Textarea id="description" name="description" defaultValue={editingTool?.description} className="col-span-3 bg-gray-700 text-gray-100" />
               </div>
-              <div className="grid gri d-cols-4 items-center gap-4">
+              <div className="grid grid-cols-4 items-center gap-4">
                 <Label htmlFor="category" className="text-right">分类</Label>
                 <Select name="category" defaultValue={editingTool?.category || '必备软件'}>
                   <SelectTrigger className="col-span-3 bg-gray-700 text-gray-100">
@@ -286,6 +318,38 @@ export default function CryptoToolsHub() {
             </div>
             <DialogFooter>
               <Button type="submit" className="bg-blue-600 hover:bg-blue-700">保存</Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
+
+      {/* Admin Login Dialog */}
+      <Dialog open={showAdminDialog} onOpenChange={setShowAdminDialog}>
+        <DialogContent className="bg-gray-800 text-gray-100">
+          <DialogHeader>
+            <DialogTitle>管理员登录</DialogTitle>
+            <DialogDescription>
+              请输入管理员密码以启用编辑功能。
+            </DialogDescription>
+          </DialogHeader>
+          <form onSubmit={(e) => {
+            e.preventDefault()
+            handleAdminLogin()
+          }}>
+            <div className="grid gap-4 py-4">
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="password" className="text-right">密码</Label>
+                <Input
+                  id="password"
+                  type="password"
+                  value={adminPassword}
+                  onChange={(e) => setAdminPassword(e.target.value)}
+                  className="col-span-3 bg-gray-700 text-gray-100"
+                />
+              </div>
+            </div>
+            <DialogFooter>
+              <Button type="submit" className="bg-blue-600 hover:bg-blue-700">登录</Button>
             </DialogFooter>
           </form>
         </DialogContent>
