@@ -5,10 +5,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Textarea } from "@/components/ui/textarea"
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
-import { Label } from "@/components/ui/label"
-import { Bitcoin, Wallet, LineChart, Bot, Search, Plus, Edit, Link, Mail, Lock, Unlock, BookOpen, Coins, Zap } from 'lucide-react'
+import { Bitcoin, Wallet, LineChart, Bot, Search, Link, Mail, BookOpen, Coins, Zap } from 'lucide-react'
 import ContactAuthor from '@/components/ContactAuthor'
 
 const categories = [
@@ -31,19 +28,11 @@ interface Tool {
   installLink: string;
 }
 
-const ADMIN_PASSWORD = "admin123" // 在实际应用中，请使用更安全的方式存储密码
-
 export default function CryptoToolsHub() {
   const [activeCategory, setActiveCategory] = useState('全部')
   const [searchTerm, setSearchTerm] = useState('')
   const [sortBy, setSortBy] = useState<string>('name')
   const [tools, setTools] = useState<Tool[]>([])
-  const [isDialogOpen, setIsDialogOpen] = useState(false)
-  const [editingTool, setEditingTool] = useState<Tool | null>(null)
-  const [debugInfo, setDebugInfo] = useState<string>('')
-  const [isAdminMode, setIsAdminMode] = useState(false)
-  const [adminPassword, setAdminPassword] = useState('')
-  const [showAdminDialog, setShowAdminDialog] = useState(false)
 
   useEffect(() => {
     const loadTools = () => {
@@ -52,7 +41,6 @@ export default function CryptoToolsHub() {
         if (savedTools) {
           const parsedTools = JSON.parse(savedTools)
           setTools(parsedTools)
-          setDebugInfo(`已从 localStorage 加载 ${parsedTools.length} 个工具`)
         } else {
           const initialTools: Tool[] = [
             { id: '1', name: '比特币钱包', description: '安全存储比特币', category: '常用钱包', installLink: 'https://bitcoin.org/en/choose-your-wallet' },
@@ -69,90 +57,20 @@ export default function CryptoToolsHub() {
           ]
           setTools(initialTools)
           localStorage.setItem('cryptoTools', JSON.stringify(initialTools))
-          setDebugInfo(`已初始化并保存 ${initialTools.length} 个默认工具`)
         }
-      } catch (error: unknown) {
+      } catch (error) {
         console.error('加载工具时出错:', error)
-        if (error instanceof Error) {
-          setDebugInfo(`加载工具时出错: ${error.message}`)
-        } else {
-          setDebugInfo('加载工具时出现未知错误')
-        }
       }
     }
 
     loadTools()
   }, [])
 
-  useEffect(() => {
-    try {
-      localStorage.setItem('cryptoTools', JSON.stringify(tools))
-      setDebugInfo(`已将 ${tools.length} 个工具保存到 localStorage`)
-    } catch (error: unknown) {
-      console.error('保存到 localStorage 时出错:', error)
-      if (error instanceof Error) {
-        setDebugInfo(`保存到 localStorage 时出错: ${error.message}`)
-      } else {
-        setDebugInfo('保存到 localStorage 时出现未知错误')
-      }
-    }
-  }, [tools])
-
   const filteredTools = tools.filter(tool => 
     (activeCategory === '全部' || tool.category === activeCategory) &&
     (tool.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
      tool.description.toLowerCase().includes(searchTerm.toLowerCase()))
   ).sort((a, b) => a[sortBy as keyof Tool].localeCompare(b[sortBy as keyof Tool]))
-
-  const handleEditTool = (tool: Tool) => {
-    setEditingTool(tool)
-    setIsDialogOpen(true)
-  }
-
-  const handleAddTool = () => {
-    setEditingTool({
-      id: '',
-      name: '',
-      description: '',
-      category: '必备软件',
-      installLink: '',
-    })
-    setIsDialogOpen(true)
-  }
-
-  const handleSaveTool = (updatedTool: Tool) => {
-    setTools(prevTools => {
-      if (updatedTool.id) {
-        // Editing an existing tool
-        const newTools = prevTools.map(tool => tool.id === updatedTool.id ? updatedTool : tool)
-        setDebugInfo(`已更新工具: ${updatedTool.name}`)
-        return newTools
-      } else {
-        // Adding a new tool
-        const newTool = { ...updatedTool, id: String(Date.now()) }
-        setDebugInfo(`已添加新工具: ${newTool.name}`)
-        return [...prevTools, newTool]
-      }
-    })
-    setIsDialogOpen(false)
-    setEditingTool(null)
-  }
-
-  const handleAdminLogin = () => {
-    if (adminPassword === ADMIN_PASSWORD) {
-      setIsAdminMode(true)
-      setShowAdminDialog(false)
-      setAdminPassword('')
-      setDebugInfo('管理员模式已启用')
-    } else {
-      setDebugInfo('密码错误，请重试')
-    }
-  }
-
-  const handleAdminLogout = () => {
-    setIsAdminMode(false)
-    setDebugInfo('管理员模式已禁用')
-  }
 
   return (
     <div className="flex h-screen bg-gray-900 text-gray-100">
@@ -205,25 +123,8 @@ export default function CryptoToolsHub() {
                 </Select>
               </>
             )}
-            {isAdminMode && activeCategory !== '联系作者' && (
-              <Button onClick={handleAddTool} className="bg-green-600 hover:bg-green-700">
-                <Plus className="mr-2 h-4 w-4" /> 添加工具
-              </Button>
-            )}
-            <Button
-              onClick={isAdminMode ? handleAdminLogout : () => setShowAdminDialog(true)}
-              className={isAdminMode ? "bg-red-600 hover:bg-red-700" : "bg-blue-600 hover:bg-blue-700"}
-            >
-              {isAdminMode ? <Unlock className="mr-2 h-4 w-4" /> : <Lock className="mr-2 h-4 w-4" />}
-              {isAdminMode ? '退出管理员模式' : '管理员模式'}
-            </Button>
           </div>
         </div>
-        {debugInfo && (
-          <div className="mb-4 p-4 bg-yellow-200 text-yellow-800 rounded">
-            调试信息: {debugInfo}
-          </div>
-        )}
         {activeCategory === '联系作者' ? (
           <ContactAuthor />
         ) : (
@@ -242,11 +143,6 @@ export default function CryptoToolsHub() {
                         <Link className="mr-2 h-4 w-4" /> 安装
                       </a>
                     </Button>
-                    {isAdminMode && (
-                      <Button onClick={() => handleEditTool(tool)} variant="outline" className="text-blue-400 border-blue-400 hover:bg-blue-400 hover:text-white">
-                        <Edit className="mr-2 h-4 w-4" /> 编辑
-                      </Button>
-                    )}
                   </div>
                 </CardContent>
               </Card>
@@ -254,93 +150,6 @@ export default function CryptoToolsHub() {
           </div>
         )}
       </div>
-
-      {/* Edit/Add Tool Dialog */}
-      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="bg-gray-800 text-gray-100">
-          <DialogHeader>
-            <DialogTitle>{editingTool?.id ? '编辑工具' : '添加新工具'}</DialogTitle>
-            <DialogDescription>
-              {editingTool?.id ? '在这里修改工具信息。' : '在这里添加新的工具信息。'}
-            </DialogDescription>
-          </DialogHeader>
-          <form onSubmit={(e) => {
-            e.preventDefault()
-            const formData = new FormData(e.currentTarget)
-            const updatedTool: Tool = {
-              id: editingTool?.id || '',
-              name: formData.get('name') as string,
-              description: formData.get('description') as string,
-              category: formData.get('category') as string,
-              installLink: formData.get('installLink') as string,
-            }
-            handleSaveTool(updatedTool)
-          }}>
-            <div className="grid gap-4 py-4">
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="name" className="text-right">名称</Label>
-                <Input id="name" name="name" defaultValue={editingTool?.name} className="col-span-3 bg-gray-700 text-gray-100" />
-              </div>
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="description" className="text-right">描述</Label>
-                <Textarea id="description" name="description" defaultValue={editingTool?.description} className="col-span-3 bg-gray-700 text-gray-100" />
-              </div>
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="category" className="text-right">分类</Label>
-                <Select name="category" defaultValue={editingTool?.category || '必备软件'}>
-                  <SelectTrigger className="col-span-3 bg-gray-700 text-gray-100">
-                    <SelectValue placeholder="选择分类" />
-                  </SelectTrigger>
-                  <SelectContent className="bg-gray-700 text-gray-100">
-                    {categories.slice(1, -1).map((category) => (
-                      <SelectItem key={category.name} value={category.name}>{category.name}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="installLink" className="text-right">安装链接</Label>
-                <Input id="installLink" name="installLink" defaultValue={editingTool?.installLink} className="col-span-3 bg-gray-700 text-gray-100" />
-              </div>
-            </div>
-            <DialogFooter>
-              <Button type="submit" className="bg-blue-600 hover:bg-blue-700">保存</Button>
-            </DialogFooter>
-          </form>
-        </DialogContent>
-      </Dialog>
-
-      {/* Admin Login Dialog */}
-      <Dialog open={showAdminDialog} onOpenChange={setShowAdminDialog}>
-        <DialogContent className="bg-gray-800 text-gray-100">
-          <DialogHeader>
-            <DialogTitle>管理员登录</DialogTitle>
-            <DialogDescription>
-              请输入管理员密码以启用编辑功能。
-            </DialogDescription>
-          </DialogHeader>
-          <form onSubmit={(e) => {
-            e.preventDefault()
-            handleAdminLogin()
-          }}>
-            <div className="grid gap-4 py-4">
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="password" className="text-right">密码</Label>
-                <Input
-                  id="password"
-                  type="password"
-                  value={adminPassword}
-                  onChange={(e) => setAdminPassword(e.target.value)}
-                  className="col-span-3 bg-gray-700 text-gray-100"
-                />
-              </div>
-            </div>
-            <DialogFooter>
-              <Button type="submit" className="bg-blue-600 hover:bg-blue-700">登录</Button>
-            </DialogFooter>
-          </form>
-        </DialogContent>
-      </Dialog>
     </div>
   )
 }
