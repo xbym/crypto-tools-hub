@@ -8,7 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/components/ui/textarea"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
 import { Label } from "@/components/ui/label"
-import { Bitcoin, Wallet, LineChart, Bot, Search, Plus, Edit, Link, Mail, Phone, MessageCircle, Globe, Lock, Unlock, BookOpen, Coins, Zap } from 'lucide-react'
+import { Bitcoin, Wallet, LineChart, Bot, Search, Plus, Edit, Link, Mail, Lock, Unlock, BookOpen, Coins, Zap } from 'lucide-react'
 import ContactAuthor from '@/components/ContactAuthor'
 
 const categories = [
