@@ -27,17 +27,6 @@ interface Tool {
   installLink: string;
 }
 
-const initialTools: Tool[] = [
-  { id: '1', name: '比特币钱包', description: '安全存储比特币', category: '常用钱包', installLink: 'https://bitcoin.org/en/choose-your-wallet' },
-  { id: '2', name: '以太坊钱包', description: '管理以太坊和ERC20代币', category: '常用钱包', installLink: 'https://ethereum.org/en/wallets/' },
-  { id: '3', name: 'TradingView', description: '专业的图表分析工具', category: '二级看线工具', installLink: 'https://www.tradingview.com/' },
-  { id: '4', name: '币安自动交易机器人', description: '在币安上自动交易', category: '一级市场机器人', installLink: 'https://www.binance.com/en/support/faq/how-to-use-binance-trading-bots-5bd149a31f0a4e1f9d5ae6b4a4a14c76' },
-  { id: '5', name: '加密货币税务计算器', description: '计算加密货币交易的税务', category: '必备软件', installLink: 'https://koinly.io/' },
-  { id: '6', name: '区块浏览器', description: '查看区块链交易详情', category: '必备软件', installLink: 'https://etherscan.io/' },
-  { id: '7', name: '价格追踪器', description: '实时追踪加密货币价格', category: '二级看线工具', installLink: 'https://coinmarketcap.com/' },
-  { id: '8', name: 'DeFi收益农场机器人', description: '自动化DeFi收益耕作', category: '一级市场机器人', installLink: 'https://yearn.finance/' },
-]
-
 export default function CryptoToolsHub() {
   const [activeCategory, setActiveCategory] = useState('全部')
   const [searchTerm, setSearchTerm] = useState('')
@@ -56,6 +45,16 @@ export default function CryptoToolsHub() {
           setTools(parsedTools)
           setDebugInfo(`已从 localStorage 加载 ${parsedTools.length} 个工具`)
         } else {
+          const initialTools: Tool[] = [
+            { id: '1', name: '比特币钱包', description: '安全存储比特币', category: '常用钱包', installLink: 'https://bitcoin.org/en/choose-your-wallet' },
+            { id: '2', name: '以太坊钱包', description: '管理以太坊和ERC20代币', category: '常用钱包', installLink: 'https://ethereum.org/en/wallets/' },
+            { id: '3', name: 'TradingView', description: '专业的图表分析工具', category: '二级看线工具', installLink: 'https://www.tradingview.com/' },
+            { id: '4', name: '币安自动交易机器人', description: '在币安上自动交易', category: '一级市场机器人', installLink: 'https://www.binance.com/en/support/faq/how-to-use-binance-trading-bots-5bd149a31f0a4e1f9d5ae6b4a4a14c76' },
+            { id: '5', name: '加密货币税务计算器', description: '计算加密货币交易的税务', category: '必备软件', installLink: 'https://koinly.io/' },
+            { id: '6', name: '区块浏览器', description: '查看区块链交易详情', category: '必备软件', installLink: 'https://etherscan.io/' },
+            { id: '7', name: '价格追踪器', description: '实时追踪加密货币价格', category: '二级看线工具', installLink: 'https://coinmarketcap.com/' },
+            { id: '8', name: 'DeFi收益农场机器人', description: '自动化DeFi收益耕作', category: '一级市场机器人', installLink: 'https://yearn.finance/' },
+          ]
           setTools(initialTools)
           localStorage.setItem('cryptoTools', JSON.stringify(initialTools))
           setDebugInfo(`已初始化并保存 ${initialTools.length} 个默认工具`)
@@ -67,7 +66,6 @@ export default function CryptoToolsHub() {
         } else {
           setDebugInfo('加载工具时出现未知错误')
         }
-        setTools(initialTools)
       }
     }
 
@@ -101,7 +99,7 @@ export default function CryptoToolsHub() {
 
   const handleAddTool = () => {
     setEditingTool({
-      id: String(Date.now()),
+      id: '',
       name: '',
       description: '',
       category: '必备软件',
@@ -112,18 +110,20 @@ export default function CryptoToolsHub() {
 
   const handleSaveTool = (updatedTool: Tool) => {
     setTools(prevTools => {
-      let newTools: Tool[];
-      if (editingTool?.id) {
-        newTools = prevTools.map(tool => tool.id === updatedTool.id ? updatedTool : tool);
-        setDebugInfo(`已更新工具: ${updatedTool.name}`);
+      if (updatedTool.id) {
+        // Editing an existing tool
+        const newTools = prevTools.map(tool => tool.id === updatedTool.id ? updatedTool : tool)
+        setDebugInfo(`已更新工具: ${updatedTool.name}`)
+        return newTools
       } else {
-        newTools = [...prevTools, updatedTool];
-        setDebugInfo(`已添加新工具: ${updatedTool.name}`);
+        // Adding a new tool
+        const newTool = { ...updatedTool, id: String(Date.now()) }
+        setDebugInfo(`已添加新工具: ${newTool.name}`)
+        return [...prevTools, newTool]
       }
-      return newTools;
-    });
-    setIsDialogOpen(false);
-    setEditingTool(null);
+    })
+    setIsDialogOpen(false)
+    setEditingTool(null)
   }
 
   return (
@@ -249,7 +249,7 @@ export default function CryptoToolsHub() {
             e.preventDefault()
             const formData = new FormData(e.currentTarget)
             const updatedTool: Tool = {
-              id: editingTool?.id || String(Date.now()),
+              id: editingTool?.id || '',
               name: formData.get('name') as string,
               description: formData.get('description') as string,
               category: formData.get('category') as string,
@@ -266,9 +266,9 @@ export default function CryptoToolsHub() {
                 <Label htmlFor="description" className="text-right">描述</Label>
                 <Textarea id="description" name="description" defaultValue={editingTool?.description} className="col-span-3 bg-gray-700 text-gray-100" />
               </div>
-              <div className="grid grid-cols-4 items-center gap-4">
+              <div className="grid gri d-cols-4 items-center gap-4">
                 <Label htmlFor="category" className="text-right">分类</Label>
-                <Select name="category" defaultValue={editingTool?.category}>
+                <Select name="category" defaultValue={editingTool?.category || '必备软件'}>
                   <SelectTrigger className="col-span-3 bg-gray-700 text-gray-100">
                     <SelectValue placeholder="选择分类" />
                   </SelectTrigger>
