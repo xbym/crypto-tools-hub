@@ -31,33 +31,22 @@ export default function CryptoToolsHub() {
   const [activeCategory, setActiveCategory] = useState('全部')
   const [searchTerm, setSearchTerm] = useState('')
   const [sortBy, setSortBy] = useState<string>('name')
-  const [tools, setTools] = useState<Tool[]>([])
+  const [tools, setTools] = useState<Tool[]>([
+    { id: '1', name: '比特币钱包', description: '安全存储比特币', category: '常用钱包', installLink: 'https://bitcoin.org/en/choose-your-wallet' },
+    { id: '2', name: '以太坊钱包', description: '管理以太坊和ERC20代币', category: '常用钱包', installLink: 'https://ethereum.org/en/wallets/' },
+    { id: '3', name: 'TradingView', description: '专业的图表分析工具', category: '二级看线工具', installLink: 'https://www.tradingview.com/' },
+    { id: '4', name: '币安自动交易机器人', description: '在币安上自动交易', category: '一级市场机器人', installLink: 'https://www.binance.com/en/support/faq/how-to-use-binance-trading-bots-5bd149a31f0a4e1f9d5ae6b4a4a14c76' },
+    { id: '5', name: '加密货币税务计算器', description: '计算加密货币交易的税务', category: '必备软件', installLink: 'https://koinly.io/' },
+    { id: '6', name: '区块浏览器', description: '查看区块链交易详情', category: '必备软件', installLink: 'https://etherscan.io/' },
+    { id: '7', name: '价格追踪器', description: '实时追踪加密货币价格', category: '二级看线工具', installLink: 'https://coinmarketcap.com/' },
+    { id: '8', name: 'DeFi收益农场机器人', description: '自动化DeFi收益耕作', category: '一级市场机器人', installLink: 'https://yearn.finance/' },
+  ])
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [editingTool, setEditingTool] = useState<Tool | null>(null)
 
   useEffect(() => {
-    const savedTools = localStorage.getItem('cryptoTools')
-    if (savedTools) {
-      setTools(JSON.parse(savedTools))
-    } else {
-      const initialTools: Tool[] = [
-        { id: '1', name: '比特币钱包', description: '安全存储比特币', category: '常用钱包', installLink: 'https://bitcoin.org/en/choose-your-wallet' },
-        { id: '2', name: '以太坊钱包', description: '管理以太坊和ERC20代币', category: '常用钱包', installLink: 'https://ethereum.org/en/wallets/' },
-        { id: '3', name: 'TradingView', description: '专业的图表分析工具', category: '二级看线工具', installLink: 'https://www.tradingview.com/' },
-        { id: '4', name: '币安自动交易机器人', description: '在币安上自动交易', category: '一级市场机器人', installLink: 'https://www.binance.com/en/support/faq/how-to-use-binance-trading-bots-5bd149a31f0a4e1f9d5ae6b4a4a14c76' },
-        { id: '5', name: '加密货币税务计算器', description: '计算加密货币交易的税务', category: '必备软件', installLink: 'https://koinly.io/' },
-        { id: '6', name: '区块浏览器', description: '查看区块链交易详情', category: '必备软件', installLink: 'https://etherscan.io/' },
-        { id: '7', name: '价格追踪器', description: '实时追踪加密货币价格', category: '二级看线工具', installLink: 'https://coinmarketcap.com/' },
-        { id: '8', name: 'DeFi收益农场机器人', description: '自动化DeFi收益耕作', category: '一级市场机器人', installLink: 'https://yearn.finance/' },
-      ]
-      setTools(initialTools)
-      localStorage.setItem('cryptoTools', JSON.stringify(initialTools))
-    }
+    console.log('Component mounted')
   }, [])
-
-  useEffect(() => {
-    localStorage.setItem('cryptoTools', JSON.stringify(tools))
-  }, [tools])
 
   const filteredTools = tools.filter(tool => 
     (activeCategory === '全部' || tool.category === activeCategory) &&
