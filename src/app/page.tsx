@@ -6,7 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog"
 import { Label } from "@/components/ui/label"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { Bitcoin, Wallet, LineChart, Bot, Search, Plus, Edit, Link, Mail, Phone, MessageCircle, Globe } from 'lucide-react'
@@ -241,6 +241,9 @@ export default function CryptoToolsHub() {
         <DialogContent className="bg-gray-800 text-gray-100">
           <DialogHeader>
             <DialogTitle>{editingTool?.id ? '编辑工具' : '添加新工具'}</DialogTitle>
+            <DialogDescription>
+              {editingTool?.id ? '在这里修改工具信息。' : '在这里添加新的工具信息。'}
+            </DialogDescription>
           </DialogHeader>
           <form onSubmit={(e) => {
             e.preventDefault()
@@ -281,9 +284,9 @@ export default function CryptoToolsHub() {
                 <Input id="installLink" name="installLink" defaultValue={editingTool?.installLink} className="col-span-3 bg-gray-700 text-gray-100" />
               </div>
             </div>
-            <DialogTrigger asChild>
+            <DialogFooter>
               <Button type="submit" className="bg-blue-600 hover:bg-blue-700">保存</Button>
-            </DialogTrigger>
+            </DialogFooter>
           </form>
         </DialogContent>
       </Dialog>
