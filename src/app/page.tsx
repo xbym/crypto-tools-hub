@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Bitcoin, Wallet, LineChart, Bot, Search, Link, Mail, BookOpen, Coins, Zap, Bell } from 'lucide-react'
 import ContactAuthor from '@/components/ContactAuthor'
 import ImportantAnnouncements from '@/components/ImportantAnnouncements'
+import Logo from '@/components/Logo'
 
 const categories = [
   { name: '全部', icon: <Search className="w-6 h-6" /> },
@@ -60,8 +61,9 @@ export default function CryptoToolsHub() {
     <div className="flex h-screen bg-gray-900 text-gray-100">
       {/* Sidebar */}
       <div className="w-64 bg-gray-800 shadow-md">
-        <div className="p-4">
-          <h1 className="text-2xl font-bold text-blue-400">币圈工具集</h1>
+        <div className="p-4 flex items-center">
+          <Logo />
+          <h1 className="text-2xl font-bold text-blue-400 ml-2">币用宝</h1>
         </div>
         <nav className="mt-4">
           {categories.map((category) => (
