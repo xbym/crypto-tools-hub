@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Bitcoin, Wallet, LineChart, Bot, Search, Link, Mail, BookOpen, Coins, Zap, Bell } from 'lucide-react'
+import { Bitcoin, Wallet, LineChart, Bot, Search, Link, Mail, BookOpen, Coins, Zap, Bell, Menu } from 'lucide-react'
 import ContactAuthor from '@/components/ContactAuthor'
 import ImportantAnnouncements from '@/components/ImportantAnnouncements'
 import Logo from '@/components/Logo'
@@ -28,7 +28,7 @@ const initialTools = [
   { id: '2', name: '以太坊钱包', description: '管理以太坊和ERC20代币', category: '常用钱包', installLink: 'https://ethereum.org/en/wallets/' },
   { id: '3', name: 'TradingView', description: '专业的图表分析工具', category: '二级看线工具', installLink: 'https://www.tradingview.com/' },
   { id: '4', name: '币安自动交易机器人', description: '在币安上自动交易', category: '一级市场机器人', installLink: 'https://www.binance.com/en/support/faq/how-to-use-binance-trading-bots-5bd149a31f0a4e1f9d5ae6b4a4a14c76' },
-  { id: '5', name: '快连VPN', description: '安全高速的VPN服务，轻松访问全球网络。', category: '必备软件', installLink: 'https://drive.google.com/file/d/1dxzRW7lbZZB5jco9sxoNGEGpZ3ZMvNQG/view?pli=1' },
+  { id: '5', name: '加密货币税务计算器', description: '计算加密货币交易的税务', category: '必备软件', installLink: 'https://koinly.io/' },
   { id: '6', name: '区块浏览器', description: '查看区块链交易详情', category: '必备软件', installLink: 'https://etherscan.io/' },
   { id: '7', name: '价格追踪器', description: '实时追踪加密货币价格', category: '二级看线工具', installLink: 'https://coinmarketcap.com/' },
   { id: '8', name: 'DeFi收益农场机器人', description: '自动化DeFi收益耕作', category: '一级市场机器人', installLink: 'https://yearn.finance/' },
@@ -50,6 +50,7 @@ export default function CryptoToolsHub() {
   const [searchTerm, setSearchTerm] = useState('')
   const [sortBy, setSortBy] = useState<string>('name')
   const [tools] = useState<Tool[]>(initialTools)
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false)
 
   const filteredTools = tools.filter(tool => 
     (activeCategory === '全部' || tool.category === activeCategory) &&
@@ -58,12 +59,20 @@ export default function CryptoToolsHub() {
   ).sort((a, b) => a[sortBy as keyof Tool].localeCompare(b[sortBy as keyof Tool]))
 
   return (
-    <div className="flex h-screen bg-gray-900 text-gray-100">
+    <div className="flex flex-col md:flex-row h-screen bg-gray-50 text-gray-800">
+      {/* Mobile Header */}
+      <div className="md:hidden bg-white p-4 flex items-center justify-between border-b border-gray-200">
+        <Logo />
+        <Button variant="ghost" onClick={() => setIsSidebarOpen(!isSidebarOpen)}>
+          <Menu className="h-6 w-6" />
+        </Button>
+      </div>
+
       {/* Sidebar */}
-      <div className="w-64 bg-gray-800 shadow-md">
-        <div className="p-4 flex items-center">
+      <div className={`${isSidebarOpen ? 'block' : 'hidden'} md:block w-full md:w-64 bg-white shadow-md`}>
+        <div className="p-4 hidden md:flex items-center">
           <Logo />
-          <h1 className="text-2xl font-bold text-blue-400 ml-2">币用宝</h1>
+          <h1 className="text-2xl font-bold text-blue-600 ml-2">币用宝</h1>
         </div>
         <nav className="mt-4">
           {categories.map((category) => (
@@ -71,9 +80,12 @@ export default function CryptoToolsHub() {
               key={category.name}
               variant={activeCategory === category.name ? "default" : "ghost"}
               className={`w-full justify-start gap-2 px-4 py-2 text-left ${
-                activeCategory === category.name ? 'bg-blue-600 text-white' : 'text-gray-300 hover:bg-gray-700'
+                activeCategory === category.name ? 'bg-blue-100 text-blue-700' : 'text-gray-600 hover:bg-gray-100'
               }`}
-              onClick={() => setActiveCategory(category.name)}
+              onClick={() => {
+                setActiveCategory(category.name)
+                setIsSidebarOpen(false)
+              }}
             >
               {category.icon}
               {category.name}
@@ -83,26 +95,26 @@ export default function CryptoToolsHub() {
       </div>
 
       {/* Main content */}
-      <div className="flex-1 p-8 overflow-auto bg-gray-900">
-        <div className="mb-6 flex justify-between items-center">
-          <h2 className="text-3xl font-bold text-blue-400">{activeCategory}</h2>
-          <div className="flex gap-4">
+      <div className="flex-1 p-4 md:p-8 overflow-auto bg-gray-50">
+        <div className="mb-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+          <h2 className="text-2xl md:text-3xl font-bold text-blue-600">{activeCategory}</h2>
+          <div className="flex flex-col md:flex-row gap-4 w-full md:w-auto">
             {activeCategory !== '联系作者' && activeCategory !== '重要提醒' && (
               <>
                 <Input
                   placeholder="搜索工具..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-64 bg-gray-800 text-gray-100 border-gray-700 focus:border-blue-500"
+                  className="w-full md:w-64 bg-white text-gray-800 border-gray-300 focus:border-blue-500"
                 />
                 <Select 
                   value={sortBy} 
                   onValueChange={(value: string) => setSortBy(value)}
                 >
-                  <SelectTrigger className="w-[180px] bg-gray-800 text-gray-100 border-gray-700">
+                  <SelectTrigger className="w-full md:w-[180px] bg-white text-gray-800 border-gray-300">
                     <SelectValue placeholder="排序方式" />
                   </SelectTrigger>
-                  <SelectContent className="bg-gray-800 text-gray-100 border-gray-700">
+                  <SelectContent className="bg-white text-gray-800 border-gray-300">
                     <SelectItem value="name">按名称</SelectItem>
                     <SelectItem value="category">按类别</SelectItem>
                   </SelectContent>
@@ -118,13 +130,13 @@ export default function CryptoToolsHub() {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredTools.map((tool) => (
-              <Card key={tool.id} className="bg-gray-800 border-gray-700">
+              <Card key={tool.id} className="bg-white border-gray-200">
                 <CardHeader>
-                  <CardTitle className="text-blue-400">{tool.name}</CardTitle>
-                  <CardDescription className="text-gray-400">{tool.category}</CardDescription>
+                  <CardTitle className="text-blue-600">{tool.name}</CardTitle>
+                  <CardDescription className="text-gray-600">{tool.category}</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <CardDescription className="text-gray-300">{tool.description}</CardDescription>
+                  <CardDescription className="text-gray-700">{tool.description}</CardDescription>
                   <div className="mt-4 flex justify-between">
                     <Button className="bg-green-600 hover:bg-green-700 text-white" asChild>
                       <a href={tool.installLink} target="_blank" rel="noopener noreferrer">
