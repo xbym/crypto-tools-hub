@@ -16,25 +16,24 @@ const categories = [
   { name: '常用钱包', icon: <Wallet className="w-6 h-6" /> },
   { name: '二级看线工具', icon: <LineChart className="w-6 h-6" /> },
   { name: '一级市场机器人', icon: <Bot className="w-6 h-6" /> },
-  { name: '科学家学习', icon: <BookOpen className="w-6 h-6" /> },
-  { name: '币圈基础知识', icon: <Coins className="w-6 h-6" /> },
-  { name: '空投学习', icon: <Zap className="w-6 h-6" /> },
+  { name: '进大群免费教学', icon: <BookOpen className="w-6 h-6" /> },
   { name: '重要提醒', icon: <Bell className="w-6 h-6" /> },
   { name: '联系作者', icon: <Mail className="w-6 h-6" /> },
 ]
 
 const initialTools = [
-  { id: '1', name: '比特币钱包', description: '安全存储比特币', category: '常用钱包', installLink: 'https://bitcoin.org/en/choose-your-wallet' },
-  { id: '2', name: '以太坊钱包', description: '管理以太坊和ERC20代币', category: '常用钱包', installLink: 'https://ethereum.org/en/wallets/' },
+  { id: '1', name: 'Metamask', description: '以太坊生态系统的主流浏览器插件钱包。支持ERC20代币和DApp交互。', category: '常用钱包', installLink: 'https://metamask.io/download/' },
+  { id: '2', name: '欧意Web3钱包', description: '多链支持的去中心化钱包，提供安全便捷的资产管理。支持以太坊、BSC等多个公链及其代币。', category: '常用钱包', installLink: 'https://www.okx.com/cn/web3' },
   { id: '3', name: 'TradingView', description: '专业的图表分析工具', category: '二级看线工具', installLink: 'https://www.tradingview.com/' },
-  { id: '4', name: '币安自动交易机器人', description: '在币安上自动交易', category: '一级市场机器人', installLink: 'https://www.binance.com/en/support/faq/how-to-use-binance-trading-bots-5bd149a31f0a4e1f9d5ae6b4a4a14c76' },
-  { id: '5', name: '加密货币税务计算器', description: '计算加密货币交易的税务', category: '必备软件', installLink: 'https://koinly.io/' },
-  { id: '6', name: '区块浏览器', description: '查看区块链交易详情', category: '必备软件', installLink: 'https://etherscan.io/' },
+  { id: '4', name: 'Ave.ai', description: '智能加密货币交易分析平台，支持多个交易所。提供实时市场洞察和交易机会识别。', category: '一级看线工具', installLink: 'https://ave.ai/' },
+  { id: '5', name: '快连VPN', description: '安全高速的VPN服务，轻松访问全球网络。', category: '必备软件', installLink: 'https://drive.google.com/file/d/1dxzRW7lbZZB5jco9sxoNGEGpZ3ZMvNQG/view?pli=1' },
+  { id: '6', name: 'Discord', description: '加密货币社区交流平台，获取最新资讯和讨论。', category: '必备软件', installLink: 'https://drive.google.com/file/d/1PgqfkCUhXcDNPTreeGRnoFi99swVgEXI/view?usp=sharing' },
   { id: '7', name: '价格追踪器', description: '实时追踪加密货币价格', category: '二级看线工具', installLink: 'https://coinmarketcap.com/' },
-  { id: '8', name: 'DeFi收益农场机器人', description: '自动化DeFi收益耕作', category: '一级市场机器人', installLink: 'https://yearn.finance/' },
-  { id: '9', name: '区块链技术课程', description: '深入学习区块链技术原理', category: '科学家学习', installLink: 'https://www.coursera.org/specializations/blockchain' },
-  { id: '10', name: '加密货币入门指南', description: '了解加密货币的基本概念', category: '币圈基础知识', installLink: 'https://www.investopedia.com/terms/c/cryptocurrency.asp' },
-  { id: '11', name: '空投跟踪器', description: '获取最新的空投信息', category: '空投学习', installLink: 'https://airdrops.io/' },
+  { id: '8', name: 'Dexscreener', description: '多链DEX交易对分析工具，提供实时价格、流动性和交易量数据。支持自定义警报和图表分析功能。', category: '一级看线工具', installLink: 'https://dexscreener.com/' },
+  { id: '12', name: 'Telegram', description: '加密货币信息交流的即时通讯平台。获取实时市场动态和项目更新。', category: '必备软件', installLink: 'https://drive.google.com/file/d/1uo57kaCJygKcOdewLUnaWAwrLvX-Lsd-/view?usp=drive_link' },
+  { id: '13', name: 'Unisat钱包', description: '专注于比特币生态系统的Web3钱包。支持BRC20代币和铭文交易。', category: '常用钱包', installLink: 'https://unisat.io/download' },
+  { id: '14', name: 'wizz钱包', description: '支持多链的轻量级Web3钱包，专注于用户体验。提供简洁界面和快速交易功能。', category: '常用钱包', installLink: 'https://www.wizz.wallet/' },
+  { id: '15', name: 'Phantom钱包', description: 'Solana生态系统的主流Web3钱包。支持SOL及SPL代币管理、NFT收藏和DApp交互。', category: '常用钱包', installLink: 'https://phantom.app/' },
 ]
 
 interface Tool {
@@ -140,7 +139,7 @@ export default function CryptoToolsHub() {
                   <div className="mt-4 flex justify-between">
                     <Button className="bg-green-600 hover:bg-green-700 text-white" asChild>
                       <a href={tool.installLink} target="_blank" rel="noopener noreferrer">
-                        <Link className="mr-2 h-4 w-4" /> 安装
+                        <Link className="mr-2 h-4 w-4" /> 官网
                       </a>
                     </Button>
                   </div>
