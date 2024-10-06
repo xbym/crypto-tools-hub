@@ -1,4 +1,5 @@
 import React from 'react'
+import Image from 'next/image'
 import { ArrowLeft, Send } from 'lucide-react'
 
 interface Announcement {
@@ -30,17 +31,26 @@ const announcements: Announcement[] = [
 
 const AnnouncementBubble: React.FC<Announcement> = ({ date, content, imageUrl }) => (
   <div className="mb-4 flex">
-    <img
+    <Image
       src="https://ui-avatars.com/api/?name=管理员&background=random"
       alt="管理员头像"
-      className="w-8 h-8 md:w-10 md:h-10 rounded-full mr-3 flex-shrink-0"
+      width={40}
+      height={40}
+      className="rounded-full mr-3 flex-shrink-0"
     />
     <div>
       <div className="text-xs text-gray-500 mb-1">{date}</div>
       <div className="bg-blue-100 p-2 md:p-3 rounded-lg inline-block max-w-[80%]">
         <p className="text-gray-800 text-sm md:text-base mb-2">{content}</p>
         {imageUrl && (
-          <img src={imageUrl} alt="公告图片" className="w-full h-auto rounded-md" />
+          <Image
+            src={imageUrl}
+            alt="公告图片"
+            width={500}
+            height={300}
+            layout="responsive"
+            className="rounded-md"
+          />
         )}
       </div>
     </div>

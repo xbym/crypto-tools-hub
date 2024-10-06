@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Bitcoin, Wallet, LineChart, Bot, Search, Link, Mail, BookOpen, Coins, Zap, Bell, Menu } from 'lucide-react'
+import { Bitcoin, Wallet, LineChart, Bot, Search, Link, Mail, BookOpen, Bell, Menu } from 'lucide-react'
 import ContactAuthor from '@/components/ContactAuthor'
 import ImportantAnnouncements from '@/components/ImportantAnnouncements'
 import Logo from '@/components/Logo'
