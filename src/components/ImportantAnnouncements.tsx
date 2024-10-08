@@ -10,23 +10,12 @@ interface Announcement {
 }
 
 const announcements: Announcement[] = [
-  {
+  /*{
     id: '1',
     date: '2024-03-10 14:30',
     content: '比特币价格突破70,000美元，创下历史新高。这标志着加密货币市场的又一个里程碑。',
     imageUrl: '/placeholder.svg?height=200&width=400'
-  },
-  {
-    id: '2',
-    date: '2024-03-09 10:15',
-    content: '新的DeFi项目将于下周上线。该项目承诺提供更高的收益和更低的风险。请大家保持关注，但同时也要谨慎评估风险。',
-  },
-  {
-    id: '3',
-    date: '2024-03-08 18:00',
-    content: '本周我们的投资组合取得了显著的增长。总收益率达到15%，主要得益于几个关键的代币表现。详细分析报告将在周末发布。',
-    imageUrl: '/placeholder.svg?height=300&width=500'
-  },
+  },*/
 ]
 
 const AnnouncementBubble: React.FC<Announcement> = ({ date, content, imageUrl }) => (
