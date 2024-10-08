@@ -1,6 +1,6 @@
 import React from 'react'
-import Image from 'next/image'
 import { ArrowLeft, Send } from 'lucide-react'
+import Image from 'next/image'
 
 interface Announcement {
   id: string;
