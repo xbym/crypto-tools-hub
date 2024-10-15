@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from 'react'
+import React, { useState } from 'react'
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Bitcoin, Wallet, LineChart, Bot, Search, Link, Mail, BookOpen, Bell, Menu } from 'lucide-react'
 import ContactAuthor from '@/components/ContactAuthor'
 import ImportantAnnouncements from '@/components/ImportantAnnouncements'
+import WalletManager from '@/components/WalletManager'
 import Logo from '@/components/Logo'
 
 const categories = [
@@ -19,6 +20,7 @@ const categories = [
   { name: '进大群免费教学', icon: <BookOpen className="w-6 h-6" /> },
   { name: '重要提醒', icon: <Bell className="w-6 h-6" /> },
   { name: '联系作者', icon: <Mail className="w-6 h-6" /> },
+  { name: '代币交易', icon: <Wallet className="w-6 h-6" /> },
 ]
 
 const initialTools = [
@@ -59,7 +61,7 @@ export default function CryptoToolsHub() {
 
   return (
     <div className="flex flex-col md:flex-row h-screen bg-gray-50 text-gray-800">
-      {/* Mobile Header */}
+      {/* 移动端头部 */}
       <div className="md:hidden bg-white p-4 flex items-center justify-between border-b border-gray-200">
         <Logo />
         <Button variant="ghost" onClick={() => setIsSidebarOpen(!isSidebarOpen)}>
@@ -67,7 +69,7 @@ export default function CryptoToolsHub() {
         </Button>
       </div>
 
-      {/* Sidebar */}
+      {/* 侧边栏 */}
       <div className={`${isSidebarOpen ? 'block' : 'hidden'} md:block w-full md:w-64 bg-white shadow-md`}>
         <div className="p-4 hidden md:flex items-center">
           <Logo />
@@ -93,12 +95,12 @@ export default function CryptoToolsHub() {
         </nav>
       </div>
 
-      {/* Main content */}
+      {/* 主要内容 */}
       <div className="flex-1 p-4 md:p-8 overflow-auto bg-gray-50">
         <div className="mb-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
           <h2 className="text-2xl md:text-3xl font-bold text-blue-600">{activeCategory}</h2>
           <div className="flex flex-col md:flex-row gap-4 w-full md:w-auto">
-            {activeCategory !== '联系作者' && activeCategory !== '重要提醒' && (
+            {activeCategory !== '联系作者' && activeCategory !== '重要提醒' && activeCategory !== '代币交易' && (
               <>
                 <Input
                   placeholder="搜索工具..."
@@ -126,6 +128,8 @@ export default function CryptoToolsHub() {
           <ContactAuthor />
         ) : activeCategory === '重要提醒' ? (
           <ImportantAnnouncements />
+        ) : activeCategory === '代币交易' ? (
+          <WalletManager />
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredTools.map((tool) => (
