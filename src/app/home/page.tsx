@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -10,6 +10,9 @@ import ContactAuthor from '@/components/ContactAuthor'
 import ImportantAnnouncements from '@/components/ImportantAnnouncements'
 import WalletManager from '@/components/WalletManager'
 import Logo from '@/components/Logo'
+import { toast } from "@/components/ui/use-toast"
+
+const API_BASE_URL = 'http://localhost:5000/api';
 
 const categories = [
   { name: '全部', icon: <Search className="w-6 h-6" /> },
@@ -46,18 +49,83 @@ interface Tool {
   installLink: string;
 }
 
+interface User {
+  id: string;
+  username: string;
+}
+
 export default function CryptoToolsHub() {
   const [activeCategory, setActiveCategory] = useState('全部')
   const [searchTerm, setSearchTerm] = useState('')
   const [sortBy, setSortBy] = useState<string>('name')
   const [tools] = useState<Tool[]>(initialTools)
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false)
+  const [isLogin, setIsLogin] = useState(true)
+  const [username, setUsername] = useState('')
+  const [password, setPassword] = useState('')
+  const [user, setUser] = useState<User | null>(null)
+
+  useEffect(() => {
+    const storedUser = localStorage.getItem('user')
+    if (storedUser) {
+      setUser(JSON.parse(storedUser))
+    }
+  }, [])
 
   const filteredTools = tools.filter(tool => 
     (activeCategory === '全部' || tool.category === activeCategory) &&
     (tool.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
      tool.description.toLowerCase().includes(searchTerm.toLowerCase()))
   ).sort((a, b) => a[sortBy as keyof Tool].localeCompare(b[sortBy as keyof Tool]))
+
+  const handleAuth = async (e: React.FormEvent) => {
+    e.preventDefault()
+    const endpoint = isLogin ? 'login' : 'register'
+    try {
+      const response = await fetch(`${API_BASE_URL}/auth/${endpoint}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ username, password }),
+      })
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        throw new Error(data.message || '认证失败')
+      }
+
+      if (data.user) {
+        setUser(data.user)
+        localStorage.setItem('user', JSON.stringify(data.user))
+        setIsAuthModalOpen(false)
+        toast({
+          title: isLogin ? "登录成功" : "注册成功",
+          description: `欢迎, ${data.user.username}!`,
+        })
+      } else {
+        throw new Error(data.message || "认证失败")
+      }
+    } catch (error) {
+      console.error('认证错误:', error)
+      toast({
+        title: "认证失败",
+        description: error instanceof Error ? error.message : "认证过程中发生未知错误，请稍后重试。",
+        variant: "destructive",
+      })
+    }
+  }
+
+  const handleLogout = () => {
+    setUser(null)
+    localStorage.removeItem('user')
+    toast({
+      title: "登出成功",
+      description: "您已成功登出。",
+    })
+  }
 
   return (
     <div className="flex flex-col md:flex-row h-screen bg-gray-50 text-gray-800">
@@ -122,6 +190,11 @@ export default function CryptoToolsHub() {
                 </Select>
               </>
             )}
+            {user ? (
+              <Button onClick={handleLogout} className="bg-blue-600 hover:bg-blue-700 text-white">登出</Button>
+            ) : (
+              <Button onClick={() => setIsAuthModalOpen(true)} className="bg-blue-600 hover:bg-blue-700 text-white">登录/注册</Button>
+            )}
           </div>
         </div>
         {activeCategory === '联系作者' ? (
@@ -153,6 +226,60 @@ export default function CryptoToolsHub() {
           </div>
         )}
       </div>
+
+      {/* 认证模态框 */}
+      {isAuthModalOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center p-4">
+          <div className="bg-white rounded-lg shadow-xl w-full max-w-md">
+            <Card className="w-full max-w-md">
+              <CardHeader>
+                <CardTitle>{isLogin ? "登录" : "注册"}</CardTitle>
+                <CardDescription>{isLogin ? "登录您的账户" : "创建一个新账户"}</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <form onSubmit={handleAuth} className="space-y-4">
+                  <div>
+                    <label htmlFor="username" className="block text-sm font-medium text-gray-700">
+                      用户名
+                    </label>
+                    <Input
+                      id="username"
+                      type="text"
+                      value={username}
+                      onChange={(e) => setUsername(e.target.value)}
+                      required
+                
+                      className="bg-white text-gray-800 border-gray-300"
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+                      密码
+                    </label>
+                    <Input
+                      id="password"
+                      type="password"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      required
+                      className="bg-white text-gray-800 border-gray-300"
+                    />
+                  </div>
+                  <Button type="submit" className="w-full bg-blue-600 hover:bg-blue-700 text-white">
+                    {isLogin ? "登录" : "注册"}
+                  </Button>
+                </form>
+                <p className="mt-4 text-center">
+                  {isLogin ? "没有账户？" : "已有账户？"}
+                  <Button variant="link" onClick={() => setIsLogin(!isLogin)} className="text-blue-600">
+                    {isLogin ? "注册" : "登录"}
+                  </Button>
+                </p>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
