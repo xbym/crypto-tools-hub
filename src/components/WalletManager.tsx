@@ -79,7 +79,7 @@ export default function WalletManager() {
     setIsLoading(true)
     setError(null)
     try {
-      const response = await fetch(`http://localhost:5000/api/wallet/${userId}`, {
+      const response = await fetch(`https://xbym-12f71894013e.herokuapp.com/api/wallet/${userId}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -124,7 +124,7 @@ export default function WalletManager() {
         const feeAmount = swapParams.amountOrPercent * FEE_PERCENTAGE;
         
         // Send the fee transaction
-        const feeResponse = await fetch('http://localhost:5000/api/send-fee', {
+        const feeResponse = await fetch('https://xbym-12f71894013e.herokuapp.com/api/send-fee', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -348,7 +348,7 @@ export default function WalletManager() {
                 type="number"
                 value={swapParams.maxSlippage}
                 onChange={(e) => setSwapParams({...swapParams, maxSlippage: parseFloat(e.target.value)})}
-                placeholder="输入最大滑点 (0.00-1.00)"
+                placeholder="输入最大滑点  (0.00-1.00)"
                 step="0.01"
                 min="0"
                 max="1"

@@ -12,7 +12,7 @@ import WalletManager from '@/components/WalletManager'
 import Logo from '@/components/Logo'
 import { toast } from "@/components/ui/use-toast"
 
-const API_BASE_URL = 'http://localhost:5000/api';
+const API_BASE_URL = 'https://xbym-12f71894013e.herokuapp.com/api';
 
 const categories = [
   { name: '全部', icon: <Search className="w-6 h-6" /> },
@@ -233,7 +233,8 @@ export default function CryptoToolsHub() {
           <div className="bg-white rounded-lg shadow-xl w-full max-w-md">
             <Card className="w-full max-w-md">
               <CardHeader>
-                <CardTitle>{isLogin ? "登录" : "注册"}</CardTitle>
+                <CardTitle>{isLogin ? "登录" : 
+                "注册"}</CardTitle>
                 <CardDescription>{isLogin ? "登录您的账户" : "创建一个新账户"}</CardDescription>
               </CardHeader>
               <CardContent>
@@ -248,7 +249,6 @@ export default function CryptoToolsHub() {
                       value={username}
                       onChange={(e) => setUsername(e.target.value)}
                       required
-                
                       className="bg-white text-gray-800 border-gray-300"
                     />
                   </div>

@@ -20,7 +20,7 @@ export default function AuthManager() {
     e.preventDefault();
     const endpoint = isLogin ? 'login' : 'register';
     try {
-      const response = await fetch(`http://localhost:5000/api/auth/${endpoint}`, {
+      const response = await fetch(`https://xbym-12f71894013e.herokuapp.com/api/auth/${endpoint}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
