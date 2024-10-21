@@ -1,6 +1,6 @@
-"use client"
+'use client'
 
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -56,7 +56,7 @@ interface User {
   solWalletPublicKey?: string;
 }
 
-export default function CryptoToolsHub() {
+function CryptoToolsHubContent() {
   const [activeCategory, setActiveCategory] = useState('全部')
   const [searchTerm, setSearchTerm] = useState('')
   const [sortBy, setSortBy] = useState<string>('name')
@@ -255,9 +255,7 @@ export default function CryptoToolsHub() {
           <div className="bg-white rounded-lg shadow-xl w-full max-w-md">
             <Card className="w-full max-w-md">
               <CardHeader>
-                <CardTitle>{isLogin ? "登录" 
-
- : "注册"}</CardTitle>
+                <CardTitle>{isLogin ? "登录" : "注册"}</CardTitle>
                 <CardDescription>{isLogin ? "登录您的账户" : "创建一个新账户"}</CardDescription>
               </CardHeader>
               <CardContent>
@@ -319,5 +317,13 @@ export default function CryptoToolsHub() {
         </div>
       )}
     </div>
+  )
+}
+
+export default function CryptoToolsHub() {
+  return (
+    <Suspense fallback={<div>加载中...</div>}>
+      <CryptoToolsHubContent />
+    </Suspense>
   )
 }
