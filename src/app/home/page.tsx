@@ -252,7 +252,7 @@ function CryptoToolsHubContent() {
       {/* 认证模态框 */}
       {isAuthModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center p-4">
-          <div className="bg-white rounded-lg shadow-xl w-full max-w-md">
+          <div className="bg-white rounded-lg shadow-xl w-full  max-w-md">
             <Card className="w-full max-w-md">
               <CardHeader>
                 <CardTitle>{isLogin ? "登录" : "注册"}</CardTitle>
