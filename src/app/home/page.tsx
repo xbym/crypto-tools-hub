@@ -295,9 +295,8 @@ function CryptoToolsHubContent() {
                         id="inviterUsername"
                         type="text"
                         value={inviterUsername}
-                        onChange={(e) => setInviterUsername(e.target.value)}
                         className="bg-white text-gray-800 border-gray-300"
-                        readOnly={!!searchParams.get('invite')}
+                        readOnly
                       />
                     </div>
                   )}
