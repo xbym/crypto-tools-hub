@@ -1,11 +1,12 @@
 "use client"
 
 import React, { useState, useEffect } from 'react'
+import { useSearchParams } from 'next/navigation'
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Bitcoin, Wallet, LineChart, Bot, Search, Link, Mail, BookOpen, Bell, Menu } from 'lucide-react'
+import { Bitcoin, Wallet, LineChart, Bot, Search, Link, Mail, Bell, Menu } from 'lucide-react'
 import ContactAuthor from '@/components/ContactAuthor'
 import ImportantAnnouncements from '@/components/ImportantAnnouncements'
 import WalletManager from '@/components/WalletManager'
@@ -20,8 +21,7 @@ const categories = [
   { name: '常用钱包', icon: <Wallet className="w-6 h-6" /> },
   { name: '二级看线工具', icon: <LineChart className="w-6 h-6" /> },
   { name: '一级市场机器人', icon: <Bot className="w-6 h-6" /> },
-  { name: '进大群免费教学', icon: <BookOpen className="w-6 h-6" /> },
-  { name: '重要提醒', icon: <Bell className="w-6 h-6" /> },
+  { name: '进大群免费教学', icon: <Bell className="w-6 h-6" /> },
   { name: '联系作者', icon: <Mail className="w-6 h-6" /> },
   { name: '代币交易', icon: <Wallet className="w-6 h-6" /> },
 ]
@@ -52,6 +52,8 @@ interface Tool {
 interface User {
   id: string;
   username: string;
+  feeIncome?: number;
+  solWalletPublicKey?: string;
 }
 
 export default function CryptoToolsHub() {
@@ -64,14 +66,24 @@ export default function CryptoToolsHub() {
   const [isLogin, setIsLogin] = useState(true)
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
+  const [inviterUsername, setInviterUsername] = useState('')
   const [user, setUser] = useState<User | null>(null)
+
+  const searchParams = useSearchParams()
 
   useEffect(() => {
     const storedUser = localStorage.getItem('user')
     if (storedUser) {
       setUser(JSON.parse(storedUser))
     }
-  }, [])
+
+    const inviteParam = searchParams.get('invite')
+    if (inviteParam) {
+      setInviterUsername(inviteParam)
+      setIsLogin(false)
+      setIsAuthModalOpen(true)
+    }
+  }, [searchParams])
 
   const filteredTools = tools.filter(tool => 
     (activeCategory === '全部' || tool.category === activeCategory) &&
@@ -83,12 +95,16 @@ export default function CryptoToolsHub() {
     e.preventDefault()
     const endpoint = isLogin ? 'login' : 'register'
     try {
+      const body = isLogin 
+        ? JSON.stringify({ username, password })
+        : JSON.stringify({ username, password, inviterUsername });
+
       const response = await fetch(`${API_BASE_URL}/auth/${endpoint}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ username, password }),
+        body: body,
       })
 
       const data = await response.json()
@@ -105,6 +121,12 @@ export default function CryptoToolsHub() {
           title: isLogin ? "登录成功" : "注册成功",
           description: `欢迎, ${data.user.username}!`,
         })
+        if (!isLogin && data.user.solWalletPublicKey) {
+          toast({
+            title: "SOL 钱包已生成",
+            description: `您的 SOL 钱包地址: ${data.user.solWalletPublicKey}`,
+          })
+        }
       } else {
         throw new Error(data.message || "认证失败")
       }
@@ -233,8 +255,9 @@ export default function CryptoToolsHub() {
           <div className="bg-white rounded-lg shadow-xl w-full max-w-md">
             <Card className="w-full max-w-md">
               <CardHeader>
-                <CardTitle>{isLogin ? "登录" : 
-                "注册"}</CardTitle>
+                <CardTitle>{isLogin ? "登录" 
+
+ : "注册"}</CardTitle>
                 <CardDescription>{isLogin ? "登录您的账户" : "创建一个新账户"}</CardDescription>
               </CardHeader>
               <CardContent>
@@ -265,6 +288,21 @@ export default function CryptoToolsHub() {
                       className="bg-white text-gray-800 border-gray-300"
                     />
                   </div>
+                  {!isLogin && (
+                    <div>
+                      <label htmlFor="inviterUsername" className="block text-sm font-medium text-gray-700">
+                        邀请人用户名
+                      </label>
+                      <Input
+                        id="inviterUsername"
+                        type="text"
+                        value={inviterUsername}
+                        onChange={(e) => setInviterUsername(e.target.value)}
+                        className="bg-white text-gray-800 border-gray-300"
+                        readOnly={!!searchParams.get('invite')}
+                      />
+                    </div>
+                  )}
                   <Button type="submit" className="w-full bg-blue-600 hover:bg-blue-700 text-white">
                     {isLogin ? "登录" : "注册"}
                   </Button>

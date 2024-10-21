@@ -8,24 +8,30 @@ interface User {
   id: string;
   username: string;
   solWalletPublicKey?: string;
+  feeIncome?: number;
 }
 
 export default function AuthManager() {
   const [isLogin, setIsLogin] = useState(true);
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [inviterUsername, setInviterUsername] = useState('');
   const [user, setUser] = useState<User | null>(null);
 
   const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault();
     const endpoint = isLogin ? 'login' : 'register';
     try {
+      const body = isLogin 
+        ? JSON.stringify({ username, password })
+        : JSON.stringify({ username, password, inviterUsername });
+
       const response = await fetch(`https://xbym-12f71894013e.herokuapp.com/api/auth/${endpoint}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ username, password }),
+        body: body,
       });
 
       const data = await response.json();
@@ -36,6 +42,7 @@ export default function AuthManager() {
 
       if (data.user) {
         setUser(data.user);
+        localStorage.setItem('user', JSON.stringify(data.user));
         toast({
           title: isLogin ? "登录成功" : "注册成功",
           description: `欢迎, ${data.user.username}!`,
@@ -61,6 +68,7 @@ export default function AuthManager() {
 
   const handleLogout = () => {
     setUser(null);
+    localStorage.removeItem('user');
     toast({
       title: "登出成功",
       description: "您已成功登出。",
@@ -77,6 +85,9 @@ export default function AuthManager() {
         <CardContent>
           {user.solWalletPublicKey && (
             <p className="mb-4">SOL 钱包地址: {user.solWalletPublicKey}</p>
+          )}
+          {user.feeIncome !== undefined && (
+            <p className="mb-4">累计手续费收入: {user.feeIncome} SOL</p>
           )}
           <Button onClick={handleLogout}>登出</Button>
         </CardContent>
@@ -116,6 +127,19 @@ export default function AuthManager() {
               required
             />
           </div>
+          {!isLogin && (
+            <div>
+              <label htmlFor="inviterUsername" className="block text-sm font-medium text-gray-700">
+                邀请人用户名（可选）
+              </label>
+              <Input
+                id="inviterUsername"
+                type="text"
+                value={inviterUsername}
+                onChange={(e) => setInviterUsername(e.target.value)}
+              />
+            </div>
+          )}
           <Button type="submit" className="w-full">
             {isLogin ? "登录" : "注册"}
           </Button>

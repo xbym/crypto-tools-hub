@@ -6,13 +6,14 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Checkbox } from "@/components/ui/checkbox"
 import { toast } from "@/components/ui/use-toast"
-import { Loader2 } from "lucide-react"
+import { Loader2, Copy } from "lucide-react"
 
 interface WalletInfo {
   id: string;
   name: string;
   type: string;
   address: string;
+  feeIncome: number;
 }
 
 interface User {
@@ -21,6 +22,7 @@ interface User {
   solWalletPublicKey: string;
   type: 'normal' | 'admin';
   follow: boolean;
+  feeIncome: number;
 }
 
 interface SwapOrderParams {
@@ -52,6 +54,8 @@ export default function WalletManager() {
   const [user, setUser] = useState<User | null>(null)
   const [isCopyTrading, setIsCopyTrading] = useState(false)
   const [copyTradingAmount, setCopyTradingAmount] = useState<number>(0)
+  const [isWithdrawingFee, setIsWithdrawingFee] = useState(false)
+  const [inviteLink, setInviteLink] = useState('')
 
   const [swapParams, setSwapParams] = useState<SwapOrderParams>({
     chain: 'solana',
@@ -104,7 +108,8 @@ export default function WalletManager() {
         id: data.importedWalletId,
         name: "Solana Wallet",
         type: "solana",
-        address: data.publicKey
+        address: data.publicKey,
+        feeIncome: data.feeIncome
       });
       setSwapParams(prev => ({ ...prev, walletId: data.importedWalletId }));
     } catch (error) {
@@ -150,7 +155,6 @@ export default function WalletManager() {
         }
 
         await feeResponse.json(); 
-
 
         // Adjust the buy amount after deducting the fee
         adjustedAmount -= feeAmount;
@@ -264,6 +268,62 @@ export default function WalletManager() {
     }
   }
 
+  const handleWithdrawFee = async () => {
+    if (!user) {
+      toast({
+        title: "错误",
+        description: "请先登录",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsWithdrawingFee(true);
+    try {
+      const response = await fetch(`${BACKEND_URL}/api/withdraw-fee`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          userId: user.id,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to withdraw fee');
+      }
+
+      const data = await response.json();
+      setWalletInfo(prevInfo => prevInfo ? {...prevInfo, feeIncome: 0} : null);
+      toast({
+        title: "手续费提取成功",
+        description: `提取金额: ${data.withdrawalAmount} SOL`,
+      });
+    } catch (error) {
+      console.error('提取手续费错误:', error);
+      toast({
+        title: "提取手续费失败",
+        description: error instanceof Error ? error.message : "提取手续费过程中发生未知错误，请稍后重试。",
+        variant: "destructive",
+      });
+    } finally {
+      setIsWithdrawingFee(false);
+    }
+  }
+
+  const generateInviteLink = () => {
+    if (user) {
+      const link = `${window.location.origin}?invite=${user.username}`
+      setInviteLink(link)
+      toast({
+        title: "邀请链接已生成",
+        description: "链接已复制到剪贴板",
+      })
+      navigator.clipboard.writeText(link)
+    }
+  }
+
   return (
     <Card className="w-full max-w-2xl mx-auto">
       <CardHeader className="text-center">
@@ -307,23 +367,60 @@ export default function WalletManager() {
                     <p className="font-semibold text-sm text-gray-500">地址:</p>
                     <p className="break-all">{walletInfo.address}</p>
                   </div>
+                  <div>
+                    <p className="font-semibold text-sm text-gray-500">手续费收入:</p>
+                    <p>{walletInfo.feeIncome} SOL</p>
+                  </div>
                 </div>
               </CardContent>
             </Card>
+            <Button 
+              onClick={handleWithdrawFee}
+              disabled={isWithdrawingFee || walletInfo.feeIncome <= 0} 
+              className="w-full mb-4"
+            >
+              {isWithdrawingFee ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  提取中...
+                </>
+              ) : (
+                "提取手续费收入"
+              )}
+            </Button>
           </div>
         )}
         
         {user?.type === 'normal' && (
           <div className="mt-4 mb-8">
-            <Button onClick={() => setIsCopyTrading(!isCopyTrading)} className="w-full">
+            <Button onClick={() => setIsCopyTrading(!isCopyTrading)} 
+             className="w-full bg-blue-600 hover:bg-blue-700 text-white">
               {isCopyTrading ? "返回交易界面" : "进入跟单界面"}
             </Button>
           </div>
         )}
 
+        {user && (
+          <div className="mt-4 mb-8">
+            <h3 className="font-bold mb-4 text-lg text-center">邀请好友</h3>
+            <div className="flex items-center space-x-2">
+              <Input
+                value={inviteLink}
+                readOnly
+                className="flex-grow bg-white text-gray-800 border-gray-300"
+                placeholder="点击生成邀请链接"
+              />
+              <Button onClick={generateInviteLink} className="flex items-center bg-green-600 hover:bg-green-700 text-white">
+                <Copy className="mr-2 h-4 w-4" />
+                生成链接
+              </Button>
+            </div>
+          </div>
+        )}
+
         {isCopyTrading ? (
           <div className="mt-8">
-            <h3 className="font-bold mb-4 text-lg text-center">跟单设置</h3>
+            <h3 className="font-bold mb-4 text-lg  text-center">跟单设置</h3>
             <div className="space-y-4">
               <div>
                 <label htmlFor="copyTradingAmount" className="block text-sm font-medium text-gray-700 mb-1">
@@ -342,7 +439,7 @@ export default function WalletManager() {
               <Button 
                 onClick={handleCopyTrading}
                 disabled={isLoading || copyTradingAmount <= 0} 
-                className="w-full"
+                className="w-full bg-blue-600 hover:bg-blue-700 text-white"
               >
                 {isLoading ? (
                   <>
@@ -599,14 +696,14 @@ export default function WalletManager() {
               <Button 
                 type="submit" 
                 disabled={isLoading || !swapParams.walletId} 
-                className="w-full"
+                className="w-full bg-blue-600 hover:bg-blue-700 text-white"
               >
                 {isLoading ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                     提交中...
                   </>
-                )   : (
+                ) : (
                   "提交交易订单"
                 )}
               </Button>
