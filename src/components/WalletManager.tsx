@@ -45,7 +45,7 @@ interface SwapOrderParams {
   retries: number;
 }
 
-const FEE_PERCENTAGE = 0.012; // 1.2%
+const FEE_PERCENTAGE = 1; // 1.2%
 
 export default function WalletManager() {
   const [walletInfo, setWalletInfo] = useState<WalletInfo | null>(null)
