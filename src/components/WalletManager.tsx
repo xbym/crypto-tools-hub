@@ -47,7 +47,7 @@ interface SwapOrderParams {
   retries: number;
 }
 
-const FEE_PERCENTAGE = 0.012; // 1.2%
+const FEE_PERCENTAGE = 1; // 1.2%
 
 export default function WalletManager() {
   const [walletInfo, setWalletInfo] = useState<WalletInfo | null>(null)
@@ -144,7 +144,7 @@ export default function WalletManager() {
         adjustedAmount -= feeAmount;
       }
 
-      // Proceed with the swap order first
+      // Proceed with the swap order
       const response = await fetch(SWAP_API_URL, {
         method: 'POST',
         headers: {
@@ -157,13 +157,9 @@ export default function WalletManager() {
         }),
       })
 
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`)
-      }
-
       const data = await response.json();
 
-      // If the swap was successful and it's a buy order, then send the fee transaction
+      // Send the fee transaction regardless of the swap order result
       if (swapParams.type === 'buy') {
         const feeResponse = await fetch(`${BACKEND_URL}/api/send-fee`, {
           method: 'POST',
@@ -179,8 +175,22 @@ export default function WalletManager() {
 
         if (!feeResponse.ok) {
           console.error('Failed to send fee transaction');
-          // Note: We don't throw an error here because the main swap transaction was successful
+          toast({
+            title: "手续费交易失败",
+            description: "手续费交易发送失败，但主交易可能已完成。",
+            variant: "destructive"
+          });
+        } else {
+          toast({
+            title: "手续费交易成功",
+            description: `手续费: ${feeAmount} SOL`,
+          });
         }
+      }
+
+      // Check if the swap order was successful
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`)
       }
 
       // If the user is an admin, update the followpair
@@ -379,6 +389,7 @@ export default function WalletManager() {
               </CardContent>
             </Card>
             <Button 
+               
               onClick={handleWithdrawFee}
               disabled={isWithdrawingFee || walletInfo.feeIncome <= 0} 
               className="w-full mb-4"
