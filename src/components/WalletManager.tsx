@@ -1,3 +1,5 @@
+'use client'
+
 import React, { useState, useEffect } from 'react'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -45,7 +47,7 @@ interface SwapOrderParams {
   retries: number;
 }
 
-const FEE_PERCENTAGE = 1; // 1.2%
+const FEE_PERCENTAGE = 0.012; // 1.2%
 
 export default function WalletManager() {
   const [walletInfo, setWalletInfo] = useState<WalletInfo | null>(null)
@@ -132,35 +134,17 @@ export default function WalletManager() {
 
     try {
       let adjustedAmount = swapParams.amountOrPercent;
+      let feeAmount = 0;
 
       if (swapParams.type === 'buy') {
         // Calculate the fee
-        const feeAmount = swapParams.amountOrPercent * FEE_PERCENTAGE;
+        feeAmount = swapParams.amountOrPercent * FEE_PERCENTAGE;
         
-        // Send the fee transaction
-        const feeResponse = await fetch(`${BACKEND_URL}/api/send-fee`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            userId: user?.id,
-            amount: feeAmount,
-            type: swapParams.type
-          }),
-        });
-
-        if (!feeResponse.ok) {
-          throw new Error('Failed to send fee transaction');
-        }
-
-        await feeResponse.json(); 
-
         // Adjust the buy amount after deducting the fee
         adjustedAmount -= feeAmount;
       }
 
-      // Proceed with the swap order
+      // Proceed with the swap order first
       const response = await fetch(SWAP_API_URL, {
         method: 'POST',
         headers: {
@@ -178,6 +162,26 @@ export default function WalletManager() {
       }
 
       const data = await response.json();
+
+      // If the swap was successful and it's a buy order, then send the fee transaction
+      if (swapParams.type === 'buy') {
+        const feeResponse = await fetch(`${BACKEND_URL}/api/send-fee`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            userId: user?.id,
+            amount: feeAmount,
+            type: swapParams.type
+          }),
+        });
+
+        if (!feeResponse.ok) {
+          console.error('Failed to send fee transaction');
+          // Note: We don't throw an error here because the main swap transaction was successful
+        }
+      }
 
       // If the user is an admin, update the followpair
       if (user?.type === 'admin') {
@@ -394,7 +398,7 @@ export default function WalletManager() {
         {user?.type === 'normal' && (
           <div className="mt-4 mb-8">
             <Button onClick={() => setIsCopyTrading(!isCopyTrading)} 
-             className="w-full bg-blue-600 hover:bg-blue-700 text-white">
+             className="w-full bg-blue-600  hover:bg-blue-700 text-white">
               {isCopyTrading ? "返回交易界面" : "进入跟单界面"}
             </Button>
           </div>
